@@ -6,14 +6,18 @@ import {
 } from 'react-router-dom';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
+import AdminDashboard from './pages/AdminDashboard';
+import CourseDetails from './pages/CourseDetails';
 import Courses from './pages/Courses';
 import Dashboard from './pages/Dashboard';
+import InstructorDashboard from './pages/InstructorDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { authService } from './services/authService';
-import CourseDetails from './pages/CourseDetails';
 
 function App() {
+  const user = authService.getCurrentUser();
+
   return (
     <BrowserRouter>
       <Routes>
@@ -21,7 +25,11 @@ function App() {
           path="/"
           element={
             <Navigate
-              to={authService.isAuthenticated() ? '/dashboard' : '/login'}
+              to={
+                user
+                  ? authService.getHomePath(user.role)
+                  : '/login'
+              }
               replace
             />
           }
@@ -37,9 +45,50 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/courses/:courseId" element={<CourseDetails />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <Courses />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/courses/:courseId"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <CourseDetails />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/instructor"
+            element={
+              <ProtectedRoute allowedRoles={['instructor']}>
+                <InstructorDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

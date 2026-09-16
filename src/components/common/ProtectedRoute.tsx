@@ -19,7 +19,12 @@ function ProtectedRoute({
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
+    return (
+      <Navigate
+        to={authService.getHomePath(user.role)}
+        replace
+      />
+    );
   }
 
   return children;

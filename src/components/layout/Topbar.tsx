@@ -28,17 +28,19 @@ function Topbar() {
       </div>
 
       <div className="topbar-actions">
-        <form className="topbar-search" onSubmit={handleSearch}>
-          <Search size={18} />
+        {user?.role === 'student' && (
+          <form className="topbar-search" onSubmit={handleSearch}>
+            <Search size={18} />
 
-          <input
-            type="search"
-            placeholder="Search courses..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            aria-label="Search courses"
-          />
-        </form>
+            <input
+              type="search"
+              placeholder="Search courses..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              aria-label="Search courses"
+            />
+          </form>
+        )}
 
         <button className="icon-button" aria-label="Notifications">
           <Bell size={20} />

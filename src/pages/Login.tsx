@@ -21,14 +21,13 @@ function Login() {
       return;
     }
 
-    authService.login({
-      email: email.trim(),
-      password,
-      role,
+    const user = authService.login({
+        email: email.trim(),
+        password,
+        role,
     });
-
-    navigate('/dashboard');
-  }
+    navigate(authService.getHomePath(user.role));
+}
 
   return (
     <div className="auth-page">

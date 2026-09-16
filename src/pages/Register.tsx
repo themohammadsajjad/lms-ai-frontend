@@ -33,15 +33,14 @@ function Register() {
       return;
     }
 
-    authService.register({
-      name: name.trim(),
-      email: email.trim(),
-      password,
-      role,
+    const user = authService.register({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        role,
     });
-
-    navigate('/dashboard');
-  }
+    navigate(authService.getHomePath(user.role));
+}
 
   return (
     <div className="auth-page">

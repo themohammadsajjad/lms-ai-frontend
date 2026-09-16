@@ -4,6 +4,8 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
+  ShieldCheck,
+  Presentation,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
@@ -11,6 +13,36 @@ import { authService } from '../../services/authService';
 function Sidebar() {
   const navigate = useNavigate();
   const user = authService.getCurrentUser();
+
+  const navigation =
+    user?.role === 'instructor'
+      ? [
+          {
+            to: '/instructor',
+            label: 'Instructor',
+            icon: Presentation,
+          },
+        ]
+      : user?.role === 'admin'
+        ? [
+            {
+              to: '/admin',
+              label: 'Administration',
+              icon: ShieldCheck,
+            },
+          ]
+        : [
+            {
+              to: '/dashboard',
+              label: 'Dashboard',
+              icon: LayoutDashboard,
+            },
+            {
+              to: '/courses',
+              label: 'Courses',
+              icon: BookOpen,
+            },
+          ];
 
   function handleLogout() {
     authService.logout();
@@ -33,25 +65,22 @@ function Sidebar() {
       <nav className="sidebar-nav">
         <span className="sidebar-label">Workspace</span>
 
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? 'active' : ''}`
-          }
-        >
-          <LayoutDashboard size={19} />
-          Dashboard
-        </NavLink>
+        {navigation.map((item) => {
+          const Icon = item.icon;
 
-        <NavLink
-          to="/courses"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? 'active' : ''}`
-          }
-        >
-          <BookOpen size={19} />
-          Courses
-        </NavLink>
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? 'active' : ''}`
+              }
+            >
+              <Icon size={19} />
+              {item.label}
+            </NavLink>
+          );
+        })}
       </nav>
 
       <div className="sidebar-bottom">

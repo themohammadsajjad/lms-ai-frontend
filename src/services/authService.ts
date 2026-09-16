@@ -2,6 +2,7 @@ import type {
   LoginCredentials,
   RegisterData,
   User,
+  UserRole,
 } from '../types/auth';
 
 const USER_KEY = 'lms_user';
@@ -9,7 +10,7 @@ const USER_KEY = 'lms_user';
 function createUser(
   name: string,
   email: string,
-  role: User['role'],
+  role: UserRole,
 ): User {
   return {
     id: crypto.randomUUID(),
@@ -56,6 +57,18 @@ export const authService = {
       localStorage.removeItem(USER_KEY);
       return null;
     }
+  },
+
+  getHomePath(role: UserRole): string {
+    if (role === 'instructor') {
+      return '/instructor';
+    }
+
+    if (role === 'admin') {
+      return '/admin';
+    }
+
+    return '/dashboard';
   },
 
   logout(): void {
