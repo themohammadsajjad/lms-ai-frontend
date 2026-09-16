@@ -7,12 +7,15 @@ import {
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
 import AdminDashboard from './pages/AdminDashboard';
+import Assignments from './pages/Assignments';
 import CourseDetails from './pages/CourseDetails';
 import Courses from './pages/Courses';
 import Dashboard from './pages/Dashboard';
 import InstructorDashboard from './pages/InstructorDashboard';
 import LearningPlayer from './pages/LearningPlayer';
 import Login from './pages/Login';
+import Quiz from './pages/Quiz';
+import Quizzes from './pages/Quizzes';
 import Register from './pages/Register';
 import { authService } from './services/authService';
 
@@ -78,6 +81,33 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['student']}>
                 <LearningPlayer />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/assignments"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <Assignments />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/quizzes"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <Quizzes />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/quiz/:quizId"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <Quiz />
               </ProtectedRoute>
             }
           />

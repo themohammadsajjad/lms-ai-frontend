@@ -1,11 +1,13 @@
 import {
   BookOpen,
   BrainCircuit,
+  ClipboardCheck,
+  HelpCircle,
   LayoutDashboard,
   LogOut,
+  Presentation,
   Settings,
   ShieldCheck,
-  Presentation,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
@@ -41,6 +43,16 @@ function Sidebar() {
               to: '/courses',
               label: 'Courses',
               icon: BookOpen,
+            },
+            {
+              to: '/assignments',
+              label: 'Assignments',
+              icon: ClipboardCheck,
+            },
+            {
+              to: '/quizzes',
+              label: 'Quizzes',
+              icon: HelpCircle,
             },
           ];
 
