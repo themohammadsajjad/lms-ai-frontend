@@ -18,6 +18,7 @@ import Login from './pages/Login';
 import Quiz from './pages/Quiz';
 import Quizzes from './pages/Quizzes';
 import Register from './pages/Register';
+import StudyTools from './pages/StudyTools';
 import { authService } from './services/authService';
 
 function App() {
@@ -123,6 +124,15 @@ function App() {
           />
 
           <Route
+            path="/study-tools"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudyTools />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/instructor"
             element={
               <ProtectedRoute allowedRoles={['instructor']}>
@@ -141,7 +151,10 @@ function App() {
           />
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
       </Routes>
     </BrowserRouter>
   );

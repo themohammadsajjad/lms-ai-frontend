@@ -9,6 +9,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  WandSparkles,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
@@ -59,6 +60,11 @@ function Sidebar() {
               to: '/ai-tutor',
               label: 'AI Tutor',
               icon: Sparkles,
+            },
+            {
+              to: '/study-tools',
+              label: 'Study Tools',
+              icon: WandSparkles,
             },
           ];
 
