@@ -9,6 +9,7 @@ import {
   Users,
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { lessonsByCourse } from '../data/learningData';
 import { courses } from '../data/mockData';
 import { courseService } from '../services/courseService';
 
@@ -31,9 +32,11 @@ function CourseDetails() {
   }
 
   const handleEnroll = () => {
-  courseService.enroll(course.id);
-  setEnrolled(true);
-};
+    courseService.enroll(course.id);
+    setEnrolled(true);
+  };
+
+  const firstLesson = lessonsByCourse[course.id]?.[0];
 
   return (
     <section className="course-details-page">
@@ -93,12 +96,26 @@ function CourseDetails() {
                 You are enrolled
               </div>
 
-              <button className="course-primary-action">
-                Continue learning
-              </button>
+              {firstLesson ? (
+                <Link
+                  to={`/learn/${course.id}/${firstLesson.id}`}
+                  className="course-primary-action course-learning-link"
+                >
+                  Continue learning
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  className="course-primary-action"
+                  disabled
+                >
+                  Lessons coming soon
+                </button>
+              )}
             </>
           ) : (
             <button
+              type="button"
               className="course-primary-action"
               onClick={handleEnroll}
             >
@@ -147,22 +164,27 @@ function CourseDetails() {
               <CheckCircle2 size={16} />
               Structured video lessons
             </li>
+
             <li>
               <CheckCircle2 size={16} />
               Course notes and bookmarks
             </li>
+
             <li>
               <CheckCircle2 size={16} />
               Quizzes and assignments
             </li>
+
             <li>
               <CheckCircle2 size={16} />
               AI-powered learning support
             </li>
+
             <li>
               <CheckCircle2 size={16} />
               Progress tracking
             </li>
+
             <li>
               <CheckCircle2 size={16} />
               Completion certificate

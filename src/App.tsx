@@ -11,6 +11,7 @@ import CourseDetails from './pages/CourseDetails';
 import Courses from './pages/Courses';
 import Dashboard from './pages/Dashboard';
 import InstructorDashboard from './pages/InstructorDashboard';
+import LearningPlayer from './pages/LearningPlayer';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { authService } from './services/authService';
@@ -68,6 +69,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['student']}>
                 <CourseDetails />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/learn/:courseId/:lessonId"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <LearningPlayer />
               </ProtectedRoute>
             }
           />
