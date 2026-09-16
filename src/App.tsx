@@ -7,6 +7,7 @@ import {
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
 import AdminDashboard from './pages/AdminDashboard';
+import AITutor from './pages/AITutor';
 import Assignments from './pages/Assignments';
 import CourseDetails from './pages/CourseDetails';
 import Courses from './pages/Courses';
@@ -108,6 +109,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['student']}>
                 <Quiz />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/ai-tutor"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <AITutor />
               </ProtectedRoute>
             }
           />

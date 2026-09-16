@@ -8,6 +8,7 @@ import {
   Presentation,
   Settings,
   ShieldCheck,
+  Sparkles,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
@@ -54,6 +55,11 @@ function Sidebar() {
               label: 'Quizzes',
               icon: HelpCircle,
             },
+            {
+              to: '/ai-tutor',
+              label: 'AI Tutor',
+              icon: Sparkles,
+            },
           ];
 
   function handleLogout() {
@@ -75,7 +81,9 @@ function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        <span className="sidebar-label">Workspace</span>
+        <span className="sidebar-label">
+          Workspace
+        </span>
 
         {navigation.map((item) => {
           const Icon = item.icon;
@@ -85,7 +93,9 @@ function Sidebar() {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `sidebar-link ${isActive ? 'active' : ''}`
+                `sidebar-link ${
+                  isActive ? 'active' : ''
+                }`
               }
             >
               <Icon size={19} />
@@ -103,7 +113,8 @@ function Sidebar() {
 
         <div className="sidebar-user">
           <div className="sidebar-avatar">
-            {user?.name?.charAt(0).toUpperCase() || 'U'}
+            {user?.name?.charAt(0).toUpperCase() ||
+              'U'}
           </div>
 
           <div className="sidebar-user-details">
