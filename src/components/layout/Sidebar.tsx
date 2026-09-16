@@ -1,4 +1,5 @@
 import {
+  Award,
   BookOpen,
   BrainCircuit,
   ClipboardCheck,
@@ -65,6 +66,11 @@ function Sidebar() {
               to: '/study-tools',
               label: 'Study Tools',
               icon: WandSparkles,
+            },
+            {
+              to: '/achievements',
+              label: 'Achievements',
+              icon: Award,
             },
           ];
 

@@ -3940,3 +3940,417 @@ a {
     flex-direction: column;
   }
 }
+
+.certificates-page {
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.achievement-score {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  border: 1px solid #e2e4eb;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.achievement-score > div {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: #6558d8;
+  border-radius: 9px;
+  background: #efedff;
+}
+
+.achievement-score strong,
+.achievement-score span {
+  display: block;
+}
+
+.achievement-score strong {
+  color: #2d3245;
+  font-size: 16px;
+}
+
+.achievement-score span {
+  color: #969baa;
+  font-size: 7px;
+}
+
+.achievement-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+.achievement-stats-grid article {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 17px;
+  border: 1px solid #e3e5ec;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.achievement-stat-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+}
+
+.achievement-stat-icon.purple {
+  color: #6558d8;
+  background: #efedff;
+}
+
+.achievement-stat-icon.green {
+  color: #347b5f;
+  background: #e8f6ef;
+}
+
+.achievement-stat-icon.orange {
+  color: #c4782e;
+  background: #fff0e2;
+}
+
+.achievement-stat-icon.blue {
+  color: #3676bd;
+  background: #e9f3ff;
+}
+
+.achievement-stats-grid span,
+.achievement-stats-grid small {
+  display: block;
+}
+
+.achievement-stats-grid span {
+  color: #9297a7;
+  font-size: 8px;
+}
+
+.achievement-stats-grid strong {
+  display: block;
+  margin: 2px 0;
+  color: #2b3043;
+  font-size: 17px;
+}
+
+.achievement-stats-grid small {
+  color: #a0a4b1;
+  font-size: 7px;
+}
+
+.certificate-section,
+.certificate-progress-section,
+.badges-section {
+  margin-bottom: 24px;
+}
+
+.certificate-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.certificate-card {
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  color: #fff;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #292653, #403a81);
+}
+
+.certificate-card::after {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  right: -75px;
+  bottom: -90px;
+  border: 24px solid rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+}
+
+.certificate-2 {
+  background: linear-gradient(145deg, #245e67, #317f82);
+}
+
+.certificate-3 {
+  background: linear-gradient(145deg, #775036, #a26d43);
+}
+
+.certificate-card-top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.certificate-logo {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.certificate-earned-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  color: #d9f6e8;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.certificate-content {
+  position: relative;
+  z-index: 2;
+  margin: 22px 0;
+}
+
+.certificate-content > span {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 7px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.certificate-content h3 {
+  margin: 6px 0 8px;
+  font-size: 16px;
+}
+
+.certificate-content p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.63);
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+.certificate-details {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 13px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.certificate-details span,
+.certificate-details strong {
+  display: block;
+}
+
+.certificate-details span {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 6px;
+}
+
+.certificate-details strong {
+  margin-top: 3px;
+  font-size: 7px;
+}
+
+.certificate-card > button {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  width: 100%;
+  min-height: 35px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+  color: #312d64;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.certificate-progress-list {
+  display: grid;
+  gap: 10px;
+}
+
+.certificate-progress-card {
+  display: grid;
+  grid-template-columns: 43px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e4e5ec;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.certificate-progress-icon {
+  display: grid;
+  width: 41px;
+  height: 41px;
+  place-items: center;
+  color: #6558d8;
+  border-radius: 10px;
+  background: #efedff;
+}
+
+.certificate-progress-info > span {
+  color: #969baa;
+  font-size: 7px;
+  text-transform: uppercase;
+}
+
+.certificate-progress-info h3 {
+  margin: 3px 0 8px;
+  color: #32374a;
+  font-size: 11px;
+}
+
+.certificate-progress-track {
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #ececf2;
+}
+
+.certificate-progress-track > div {
+  height: 100%;
+  border-radius: inherit;
+  background: #6558d8;
+}
+
+.certificate-progress-card > strong {
+  color: #5e52c6;
+  font-size: 13px;
+}
+
+.badge-count {
+  color: #9196a6;
+  font-size: 8px;
+}
+
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.badge-card {
+  padding: 17px;
+  border: 1px solid #e3e4eb;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.badge-card.locked {
+  opacity: 0.56;
+}
+
+.badge-icon {
+  display: grid;
+  width: 43px;
+  height: 43px;
+  place-items: center;
+  margin-bottom: 14px;
+  border-radius: 12px;
+}
+
+.badge-icon-1 {
+  color: #c6772e;
+  background: #fff0e2;
+}
+
+.badge-icon-2 {
+  color: #6558d8;
+  background: #efedff;
+}
+
+.badge-icon-3 {
+  color: #337a5e;
+  background: #e8f6ef;
+}
+
+.badge-icon-4 {
+  color: #3877bd;
+  background: #e9f3ff;
+}
+
+.badge-card > span {
+  color: #969baa;
+  font-size: 7px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-card h3 {
+  margin: 5px 0 6px;
+  color: #2d3245;
+  font-size: 12px;
+}
+
+.badge-card p {
+  min-height: 34px;
+  margin: 0;
+  color: #8b90a0;
+  font-size: 8px;
+  line-height: 1.55;
+}
+
+.badge-state {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 13px;
+  padding-top: 11px;
+  color: #397b60;
+  border-top: 1px solid #eeeeF2;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.badge-card.locked .badge-state {
+  color: #8e93a3;
+}
+
+@media (max-width: 1050px) {
+  .achievement-stats-grid,
+  .certificate-grid,
+  .badge-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .achievement-stats-grid,
+  .certificate-grid,
+  .badge-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .certificate-progress-card {
+    grid-template-columns: 43px minmax(0, 1fr);
+  }
+
+  .certificate-progress-card > strong {
+    grid-column: 2;
+  }
+}

@@ -9,6 +9,7 @@ import AppLayout from './components/layout/AppLayout';
 import AdminDashboard from './pages/AdminDashboard';
 import AITutor from './pages/AITutor';
 import Assignments from './pages/Assignments';
+import Certificates from './pages/Certificates';
 import CourseDetails from './pages/CourseDetails';
 import Courses from './pages/Courses';
 import Dashboard from './pages/Dashboard';
@@ -128,6 +129,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['student']}>
                 <StudyTools />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/achievements"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <Certificates />
               </ProtectedRoute>
             }
           />
