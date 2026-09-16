@@ -6,6 +6,7 @@ import {
   HelpCircle,
   LayoutDashboard,
   LogOut,
+  MessageCircle,
   Presentation,
   Settings,
   ShieldCheck,
@@ -71,6 +72,11 @@ function Sidebar() {
               to: '/achievements',
               label: 'Achievements',
               icon: Award,
+            },
+            {
+              to: '/discussions',
+              label: 'Discussions',
+              icon: MessageCircle,
             },
           ];
 

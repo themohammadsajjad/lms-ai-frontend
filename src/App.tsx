@@ -13,9 +13,11 @@ import Certificates from './pages/Certificates';
 import CourseDetails from './pages/CourseDetails';
 import Courses from './pages/Courses';
 import Dashboard from './pages/Dashboard';
+import Discussions from './pages/Discussions';
 import InstructorDashboard from './pages/InstructorDashboard';
 import LearningPlayer from './pages/LearningPlayer';
 import Login from './pages/Login';
+import Notifications from './pages/Notifications';
 import Quiz from './pages/Quiz';
 import Quizzes from './pages/Quizzes';
 import Register from './pages/Register';
@@ -43,7 +45,10 @@ function App() {
         />
 
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
         <Route
           element={
@@ -55,7 +60,9 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -64,7 +71,9 @@ function App() {
           <Route
             path="/courses"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
                 <Courses />
               </ProtectedRoute>
             }
@@ -73,7 +82,9 @@ function App() {
           <Route
             path="/courses/:courseId"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
                 <CourseDetails />
               </ProtectedRoute>
             }
@@ -82,7 +93,9 @@ function App() {
           <Route
             path="/learn/:courseId/:lessonId"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
                 <LearningPlayer />
               </ProtectedRoute>
             }
@@ -91,7 +104,9 @@ function App() {
           <Route
             path="/assignments"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
                 <Assignments />
               </ProtectedRoute>
             }
@@ -100,7 +115,9 @@ function App() {
           <Route
             path="/quizzes"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
                 <Quizzes />
               </ProtectedRoute>
             }
@@ -109,7 +126,9 @@ function App() {
           <Route
             path="/quiz/:quizId"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
                 <Quiz />
               </ProtectedRoute>
             }
@@ -118,7 +137,9 @@ function App() {
           <Route
             path="/ai-tutor"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
                 <AITutor />
               </ProtectedRoute>
             }
@@ -127,7 +148,9 @@ function App() {
           <Route
             path="/study-tools"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
                 <StudyTools />
               </ProtectedRoute>
             }
@@ -136,16 +159,36 @@ function App() {
           <Route
             path="/achievements"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
                 <Certificates />
               </ProtectedRoute>
             }
           />
 
           <Route
+            path="/discussions"
+            element={
+              <ProtectedRoute
+                allowedRoles={['student']}
+              >
+                <Discussions />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/notifications"
+            element={<Notifications />}
+          />
+
+          <Route
             path="/instructor"
             element={
-              <ProtectedRoute allowedRoles={['instructor']}>
+              <ProtectedRoute
+                allowedRoles={['instructor']}
+              >
                 <InstructorDashboard />
               </ProtectedRoute>
             }
@@ -154,7 +197,9 @@ function App() {
           <Route
             path="/admin"
             element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute
+                allowedRoles={['admin']}
+              >
                 <AdminDashboard />
               </ProtectedRoute>
             }
