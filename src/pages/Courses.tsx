@@ -6,12 +6,15 @@ import {
   Star,
   Users,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { courses } from '../data/mockData';
 import { courseService } from '../services/courseService';
 
 function Courses() {
-  const [search, setSearch] = useState('');
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(
+    searchParams.get('search') ?? '',
+);
   const [category, setCategory] = useState('All');
 
   const categories = [

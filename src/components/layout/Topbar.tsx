@@ -1,8 +1,24 @@
 import { Bell, Search } from 'lucide-react';
+import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 
 function Topbar() {
+  const navigate = useNavigate();
   const user = authService.getCurrentUser();
+  const [search, setSearch] = useState('');
+
+  function handleSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const value = search.trim();
+
+    if (value) {
+      navigate(`/courses?search=${encodeURIComponent(value)}`);
+    } else {
+      navigate('/courses');
+    }
+  }
 
   return (
     <header className="topbar">
@@ -12,14 +28,17 @@ function Topbar() {
       </div>
 
       <div className="topbar-actions">
-        <div className="topbar-search">
+        <form className="topbar-search" onSubmit={handleSearch}>
           <Search size={18} />
+
           <input
             type="search"
             placeholder="Search courses..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
             aria-label="Search courses"
           />
-        </div>
+        </form>
 
         <button className="icon-button" aria-label="Notifications">
           <Bell size={20} />
