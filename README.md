@@ -1,32 +1,86 @@
-# React + TypeScript + Vite
+# VertexLearn LMS-AI Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+VertexLearn is a responsive Learning Management System frontend built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+The project demonstrates student, instructor, and administrator workflows for a modern AI-assisted learning platform.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+### Student Workspace
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Role-based student dashboard
+- Course catalog and search
+- Course enrollment
+- Learning progress tracking
+- Video lesson player
+- Lesson notes and bookmarks
+- Assignment submission flow
+- Quiz attempts and scoring
+- Course-grounded AI Tutor demo
+- AI study summaries
+- Flashcards and mastery tracking
+- Certificates and badges
+- Learning streaks and achievements
+- Notifications
+- Course discussions and replies
+- Persistent light and dark themes
 
-## Expanding the Oxlint configuration
+### Instructor Workspace
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+- Teaching overview
+- Course performance analytics
+- Learner activity metrics
+- Course publishing controls
+- Assignment review queue
+- Approve submissions
+- Request changes
+- Persistent instructor actions
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+### Admin Workspace
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- Platform overview
+- User management
+- Course approval workflow
+- Approve and reject course submissions
+- Activate and suspend user accounts
+- User search and role filtering
+- Platform health status
+- Recent administrative activity
+
+## Tech Stack
+
+- React
+- TypeScript
+- Vite
+- React Router
+- Lucide React
+- CSS
+- LocalStorage
+
+## Frontend Architecture
+
+The application uses a role-based frontend structure with:
+
+- reusable layout components
+- protected routes
+- mock course and assessment data
+- service modules for frontend state
+- localStorage persistence
+- responsive layouts
+- accessibility-focused interaction states
+
+Main source folders:
+
+```text
+src/
+├── components/
+│   ├── common/
+│   ├── courses/
+│   ├── ai/
+│   └── layout/
+├── data/
+├── hooks/
+├── pages/
+├── services/
+├── types/
+└── utils/
