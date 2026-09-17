@@ -21,6 +21,7 @@ import Notifications from './pages/Notifications';
 import Quiz from './pages/Quiz';
 import Quizzes from './pages/Quizzes';
 import Register from './pages/Register';
+import Settings from './pages/Settings';
 import StudyTools from './pages/StudyTools';
 import { authService } from './services/authService';
 
@@ -45,6 +46,7 @@ function App() {
         />
 
         <Route path="/login" element={<Login />} />
+
         <Route
           path="/register"
           element={<Register />}
@@ -181,6 +183,11 @@ function App() {
           <Route
             path="/notifications"
             element={<Notifications />}
+          />
+
+          <Route
+            path="/settings"
+            element={<Settings />}
           />
 
           <Route

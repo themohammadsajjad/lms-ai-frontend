@@ -124,10 +124,17 @@ function Sidebar() {
       </nav>
 
       <div className="sidebar-bottom">
-        <button className="sidebar-link sidebar-button">
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `sidebar-link ${
+              isActive ? 'active' : ''
+            }`
+          }
+        >
           <Settings size={19} />
           Settings
-        </button>
+        </NavLink>
 
         <div className="sidebar-user">
           <div className="sidebar-avatar">
