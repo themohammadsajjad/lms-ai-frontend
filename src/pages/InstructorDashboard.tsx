@@ -4,16 +4,28 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Clock3,
+  Plus,
+  Sparkles,
   Star,
   TrendingUp,
   Users,
+  X,
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
-import { weeklyAnalytics } from '../data/instructorData';
+import InstructorMaterials from '../components/instructor/InstructorMaterials';
+import {
+  weeklyAnalytics,
+  type PricingTier,
+} from '../data/instructorData';
 import { instructorService } from '../services/instructorService';
 
-type InstructorTab = 'overview' | 'courses' | 'reviews';
+type InstructorTab =
+  | 'overview'
+  | 'courses'
+  | 'materials'
+  | 'reviews'
+  | 'ai-quizzes';
 
 function InstructorDashboard() {
   const [activeTab, setActiveTab] =
@@ -27,44 +39,96 @@ function InstructorDashboard() {
     instructorService.getReviews(),
   );
 
+  const [aiQuizzes, setAIQuizzes] = useState(() =>
+    instructorService.getAIQuizDrafts(),
+  );
+
+  const [
+    showCreateCourse,
+    setShowCreateCourse,
+  ] = useState(false);
+
+  const [courseForm, setCourseForm] =
+    useState<{
+      title: string;
+      description: string;
+      category: string;
+      thumbnail: string;
+      pricingTier: PricingTier;
+    }>({
+      title: '',
+      description: '',
+      category: 'Web Development',
+      thumbnail: '',
+      pricingTier: 'Free',
+    });
+
   const publishedCourses = courses.filter(
-    (course) => course.status === 'published',
+    (course) =>
+      course.status === 'published',
   ).length;
 
   const totalLearners = courses.reduce(
-    (total, course) => total + course.learners,
+    (total, course) =>
+      total + course.learners,
     0,
   );
 
   const pendingReviews = reviews.filter(
-    (review) => review.status === 'pending',
+    (review) =>
+      review.status === 'pending',
   ).length;
 
+  const pendingAIQuizzes = aiQuizzes.filter(
+    (quiz) =>
+      quiz.status === 'pending',
+  ).length;
+
+  const publishedCourseList =
+    courses.filter(
+      (course) =>
+        course.status === 'published',
+    );
+
   const averageCompletion =
-    courses.length > 0
+    publishedCourseList.length > 0
       ? Math.round(
-          courses.reduce(
+          publishedCourseList.reduce(
             (total, course) =>
-              total + course.completionRate,
+              total +
+              course.completionRate,
             0,
-          ) / courses.length,
+          ) /
+            publishedCourseList.length,
         )
       : 0;
 
-  const topCourse = [...courses].sort(
-    (a, b) =>
-      b.completionRate - a.completionRate,
-  )[0];
+  const topCourse = [...courses]
+    .filter(
+      (course) =>
+        course.status === 'published',
+    )
+    .sort(
+      (a, b) =>
+        b.completionRate -
+        a.completionRate,
+    )[0];
 
-  function handleCourseStatus(courseId: string) {
+  function handleCourseStatus(
+    courseId: string,
+  ) {
     setCourses(
-      instructorService.toggleCourseStatus(courseId),
+      instructorService.toggleCourseStatus(
+        courseId,
+      ),
     );
   }
 
   function handleReview(
     reviewId: string,
-    status: 'approved' | 'changes-requested',
+    status:
+      | 'approved'
+      | 'changes-requested',
   ) {
     setReviews(
       instructorService.updateReviewStatus(
@@ -72,6 +136,51 @@ function InstructorDashboard() {
         status,
       ),
     );
+  }
+
+  function handleAIQuizReview(
+    quizId: string,
+    status:
+      | 'approved'
+      | 'changes-requested',
+  ) {
+    setAIQuizzes(
+      instructorService.updateAIQuizStatus(
+        quizId,
+        status,
+      ),
+    );
+  }
+
+  function handleCreateCourse() {
+    if (
+      !courseForm.title.trim() ||
+      !courseForm.description.trim() ||
+      !courseForm.category.trim()
+    ) {
+      return;
+    }
+
+    setCourses(
+      instructorService.createCourse(
+        courseForm,
+      ),
+    );
+
+    setCourseForm({
+      title: '',
+      description: '',
+      category: 'Web Development',
+      thumbnail: '',
+      pricingTier: 'Free',
+    });
+
+    setShowCreateCourse(false);
+    setActiveTab('courses');
+  }
+
+  function closeCreateCourse() {
+    setShowCreateCourse(false);
   }
 
   return (
@@ -85,8 +194,10 @@ function InstructorDashboard() {
           <h1>Teaching overview</h1>
 
           <p>
-            Manage courses, monitor learners and review
-            student activity.
+            Manage courses, learning
+            materials, learners, student
+            submissions and AI-generated
+            assessments.
           </p>
         </div>
 
@@ -103,10 +214,17 @@ function InstructorDashboard() {
           </div>
 
           <div>
-            <span>Published courses</span>
-            <strong>{publishedCourses}</strong>
+            <span>
+              Published courses
+            </span>
+
+            <strong>
+              {publishedCourses}
+            </strong>
+
             <small>
-              {courses.length} total courses
+              {courses.length} total
+              courses
             </small>
           </div>
         </article>
@@ -117,33 +235,61 @@ function InstructorDashboard() {
           </div>
 
           <div>
-            <span>Active learners</span>
-            <strong>{totalLearners}</strong>
-            <small>Across all courses</small>
+            <span>
+              Active learners
+            </span>
+
+            <strong>
+              {totalLearners}
+            </strong>
+
+            <small>
+              Across all courses
+            </small>
           </div>
         </article>
 
         <article>
           <div className="instructor-stat-icon orange">
-            <ClipboardCheck size={20} />
+            <ClipboardCheck
+              size={20}
+            />
           </div>
 
           <div>
-            <span>Pending reviews</span>
-            <strong>{pendingReviews}</strong>
-            <small>Assignments awaiting review</small>
+            <span>
+              Pending reviews
+            </span>
+
+            <strong>
+              {pendingReviews}
+            </strong>
+
+            <small>
+              Assignments awaiting review
+            </small>
           </div>
         </article>
 
         <article>
           <div className="instructor-stat-icon green">
-            <TrendingUp size={20} />
+            <TrendingUp
+              size={20}
+            />
           </div>
 
           <div>
-            <span>Avg. completion</span>
-            <strong>{averageCompletion}%</strong>
-            <small>Learner completion rate</small>
+            <span>
+              Avg. completion
+            </span>
+
+            <strong>
+              {averageCompletion}%
+            </strong>
+
+            <small>
+              Published courses only
+            </small>
           </div>
         </article>
       </div>
@@ -152,9 +298,13 @@ function InstructorDashboard() {
         <button
           type="button"
           className={
-            activeTab === 'overview' ? 'active' : ''
+            activeTab === 'overview'
+              ? 'active'
+              : ''
           }
-          onClick={() => setActiveTab('overview')}
+          onClick={() =>
+            setActiveTab('overview')
+          }
         >
           Overview
         </button>
@@ -162,9 +312,13 @@ function InstructorDashboard() {
         <button
           type="button"
           className={
-            activeTab === 'courses' ? 'active' : ''
+            activeTab === 'courses'
+              ? 'active'
+              : ''
           }
-          onClick={() => setActiveTab('courses')}
+          onClick={() =>
+            setActiveTab('courses')
+          }
         >
           Courses
         </button>
@@ -172,14 +326,56 @@ function InstructorDashboard() {
         <button
           type="button"
           className={
-            activeTab === 'reviews' ? 'active' : ''
+            activeTab === 'materials'
+              ? 'active'
+              : ''
           }
-          onClick={() => setActiveTab('reviews')}
+          onClick={() =>
+            setActiveTab('materials')
+          }
+        >
+          Materials
+        </button>
+
+        <button
+          type="button"
+          className={
+            activeTab === 'reviews'
+              ? 'active'
+              : ''
+          }
+          onClick={() =>
+            setActiveTab('reviews')
+          }
         >
           Reviews
 
           {pendingReviews > 0 && (
-            <span>{pendingReviews}</span>
+            <span>
+              {pendingReviews}
+            </span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          className={
+            activeTab === 'ai-quizzes'
+              ? 'active'
+              : ''
+          }
+          onClick={() =>
+            setActiveTab(
+              'ai-quizzes',
+            )
+          }
+        >
+          AI Quiz Review
+
+          {pendingAIQuizzes > 0 && (
+            <span>
+              {pendingAIQuizzes}
+            </span>
           )}
         </button>
       </div>
@@ -189,83 +385,120 @@ function InstructorDashboard() {
           <section className="instructor-panel analytics-panel">
             <div className="instructor-panel-heading">
               <div>
-                <span>Engagement analytics</span>
-                <h2>Weekly learner activity</h2>
+                <span>
+                  Engagement analytics
+                </span>
+
+                <h2>
+                  Weekly learner activity
+                </h2>
+
                 <p>
-                  Course engagement across the last
-                  seven days.
+                  Course engagement across
+                  the last seven days.
                 </p>
               </div>
 
               <div className="analytics-change">
-                <TrendingUp size={14} />
+                <TrendingUp
+                  size={14}
+                />
                 12.4%
               </div>
             </div>
 
             <div className="analytics-chart">
-              {weeklyAnalytics.map((item) => (
-                <div
-                  className="analytics-column"
-                  key={item.label}
-                >
-                  <div className="analytics-bar-area">
-                    <div
-                      className="analytics-bar"
-                      style={{
-                        height: `${item.value}%`,
-                      }}
-                    >
-                      <span>{item.value}</span>
+              {weeklyAnalytics.map(
+                (item) => (
+                  <div
+                    className="analytics-column"
+                    key={item.label}
+                  >
+                    <div className="analytics-bar-area">
+                      <div
+                        className="analytics-bar"
+                        style={{
+                          height: `${item.value}%`,
+                        }}
+                      >
+                        <span>
+                          {item.value}
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  <small>{item.label}</small>
-                </div>
-              ))}
+                    <small>
+                      {item.label}
+                    </small>
+                  </div>
+                ),
+              )}
             </div>
           </section>
 
           <aside className="instructor-panel top-course-panel">
             <div className="instructor-panel-heading">
               <div>
-                <span>Top performance</span>
-                <h2>Leading course</h2>
+                <span>
+                  Top performance
+                </span>
+
+                <h2>
+                  Leading course
+                </h2>
               </div>
             </div>
 
             {topCourse && (
               <>
                 <div className="top-course-icon">
-                  <BookOpen size={24} />
+                  <BookOpen
+                    size={24}
+                  />
                 </div>
 
                 <span className="top-course-category">
-                  {topCourse.category}
+                  {
+                    topCourse.category
+                  }
                 </span>
 
-                <h3>{topCourse.title}</h3>
+                <h3>
+                  {topCourse.title}
+                </h3>
 
                 <div className="top-course-rating">
                   <Star
                     size={14}
                     fill="currentColor"
                   />
+
                   {topCourse.rating}
                 </div>
 
                 <div className="top-course-metrics">
                   <div>
-                    <span>Learners</span>
+                    <span>
+                      Learners
+                    </span>
+
                     <strong>
-                      {topCourse.learners}
+                      {
+                        topCourse.learners
+                      }
                     </strong>
                   </div>
 
                   <div>
-                    <span>Completion</span>
+                    <span>
+                      Completion
+                    </span>
+
                     <strong>
-                      {topCourse.completionRate}%
+                      {
+                        topCourse.completionRate
+                      }
+                      %
                     </strong>
                   </div>
                 </div>
@@ -284,17 +517,26 @@ function InstructorDashboard() {
           <section className="instructor-panel recent-courses-panel">
             <div className="instructor-panel-heading">
               <div>
-                <span>Course portfolio</span>
-                <h2>Course performance</h2>
+                <span>
+                  Course portfolio
+                </span>
+
+                <h2>
+                  Course performance
+                </h2>
+
                 <p>
-                  Current learner and completion data.
+                  Current learner and
+                  completion data.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() =>
-                  setActiveTab('courses')
+                  setActiveTab(
+                    'courses',
+                  )
                 }
               >
                 View all
@@ -302,49 +544,78 @@ function InstructorDashboard() {
             </div>
 
             <div className="instructor-course-overview-list">
-              {courses.slice(0, 3).map((course) => (
-                <article key={course.id}>
-                  <div className="course-overview-icon">
-                    <BookOpen size={18} />
-                  </div>
-
-                  <div className="course-overview-main">
-                    <span>{course.category}</span>
-                    <strong>{course.title}</strong>
-
-                    <div>
-                      <div
-                        style={{
-                          width: `${course.completionRate}%`,
-                        }}
+              {courses
+                .slice(0, 3)
+                .map((course) => (
+                  <article
+                    key={course.id}
+                  >
+                    <div className="course-overview-icon">
+                      <BookOpen
+                        size={18}
                       />
                     </div>
-                  </div>
 
-                  <div className="course-overview-data">
-                    <strong>
-                      {course.completionRate}%
-                    </strong>
-                    <span>
-                      {course.learners} learners
-                    </span>
-                  </div>
-                </article>
-              ))}
+                    <div className="course-overview-main">
+                      <span>
+                        {
+                          course.category
+                        }
+                      </span>
+
+                      <strong>
+                        {
+                          course.title
+                        }
+                      </strong>
+
+                      <div>
+                        <div
+                          style={{
+                            width: `${course.completionRate}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="course-overview-data">
+                      <strong>
+                        {
+                          course.completionRate
+                        }
+                        %
+                      </strong>
+
+                      <span>
+                        {
+                          course.learners
+                        }{' '}
+                        learners
+                      </span>
+                    </div>
+                  </article>
+                ))}
             </div>
           </section>
 
           <section className="instructor-panel review-preview-panel">
             <div className="instructor-panel-heading">
               <div>
-                <span>Review queue</span>
-                <h2>Needs your attention</h2>
+                <span>
+                  Review queue
+                </span>
+
+                <h2>
+                  Needs your attention
+                </h2>
               </div>
 
               <button
                 type="button"
                 onClick={() =>
-                  setActiveTab('reviews')
+                  setActiveTab(
+                    'reviews',
+                  )
                 }
               >
                 Review all
@@ -355,11 +626,14 @@ function InstructorDashboard() {
               {reviews
                 .filter(
                   (review) =>
-                    review.status === 'pending',
+                    review.status ===
+                    'pending',
                 )
                 .slice(0, 3)
                 .map((review) => (
-                  <article key={review.id}>
+                  <article
+                    key={review.id}
+                  >
                     <div className="review-student-avatar">
                       {review.studentName
                         .charAt(0)
@@ -368,16 +642,22 @@ function InstructorDashboard() {
 
                     <div>
                       <strong>
-                        {review.studentName}
+                        {
+                          review.studentName
+                        }
                       </strong>
 
                       <span>
-                        {review.assignmentTitle}
+                        {
+                          review.assignmentTitle
+                        }
                       </span>
                     </div>
 
                     <small>
-                      {review.submittedAt}
+                      {
+                        review.submittedAt
+                      }
                     </small>
                   </article>
                 ))}
@@ -394,109 +674,194 @@ function InstructorDashboard() {
                 Course management
               </span>
 
-              <h2>Your courses</h2>
+              <h2>
+                Your courses
+              </h2>
 
               <p>
-                Monitor learner activity and control
-                publishing status.
+                Create courses, monitor
+                learner activity and
+                control publishing status.
               </p>
             </div>
 
-            <div className="course-status-summary">
-              <strong>
-                {publishedCourses}
-              </strong>
-              <span>Published</span>
+            <div className="instructor-course-heading-actions">
+              <button
+                type="button"
+                className="create-course-button"
+                onClick={() =>
+                  setShowCreateCourse(
+                    true,
+                  )
+                }
+              >
+                <Plus size={15} />
+                Create course
+              </button>
+
+              <div className="course-status-summary">
+                <strong>
+                  {publishedCourses}
+                </strong>
+
+                <span>
+                  Published
+                </span>
+              </div>
             </div>
           </div>
 
           <div className="instructor-course-grid">
-            {courses.map((course) => (
-              <article
-                className="instructor-course-card"
-                key={course.id}
-              >
-                <div className="instructor-course-card-header">
-                  <div className="instructor-course-card-icon">
-                    <BookOpen size={21} />
+            {courses.map(
+              (course) => (
+                <article
+                  className="instructor-course-card"
+                  key={course.id}
+                >
+                  <div className="instructor-course-card-header">
+                    <div className="instructor-course-card-icon">
+                      <BookOpen
+                        size={21}
+                      />
+                    </div>
+
+                    <span
+                      className={`course-publish-status ${course.status}`}
+                    >
+                      {
+                        course.status
+                      }
+                    </span>
                   </div>
 
-                  <span
-                    className={`course-publish-status ${course.status}`}
-                  >
-                    {course.status}
-                  </span>
-                </div>
-
-                <span className="instructor-course-category">
-                  {course.category}
-                </span>
-
-                <h3>{course.title}</h3>
-
-                <div className="instructor-course-card-meta">
-                  <span>
-                    <Users size={14} />
-                    {course.learners} learners
-                  </span>
-
-                  <span>
-                    <BookOpen size={14} />
-                    {course.lessons} lessons
-                  </span>
-
-                  <span>
-                    <Star
-                      size={14}
-                      fill="currentColor"
-                    />
-                    {course.rating}
-                  </span>
-                </div>
-
-                <div className="instructor-course-progress">
-                  <div>
-                    <span>Completion</span>
-
-                    <strong>
-                      {course.completionRate}%
-                    </strong>
-                  </div>
-
-                  <div className="instructor-progress-track">
-                    <div
-                      style={{
-                        width: `${course.completionRate}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="instructor-course-footer">
-                  <span>
-                    Updated {course.updatedAt}
-                  </span>
-
-                  <button
-                    type="button"
-                    className={
-                      course.status === 'published'
-                        ? 'unpublish'
-                        : 'publish'
+                  <span className="instructor-course-category">
+                    {
+                      course.category
                     }
-                    onClick={() =>
-                      handleCourseStatus(course.id)
-                    }
-                  >
-                    {course.status === 'published'
-                      ? 'Move to draft'
-                      : 'Publish course'}
-                  </button>
-                </div>
-              </article>
-            ))}
+                  </span>
+
+                  {course.pricingTier && (
+                    <span className="course-pricing-tier">
+                      {
+                        course.pricingTier
+                      }
+                    </span>
+                  )}
+
+                  <h3>
+                    {course.title}
+                  </h3>
+
+                  {course.description && (
+                    <p className="instructor-course-description">
+                      {
+                        course.description
+                      }
+                    </p>
+                  )}
+
+                  <div className="instructor-course-card-meta">
+                    <span>
+                      <Users
+                        size={14}
+                      />
+
+                      {
+                        course.learners
+                      }{' '}
+                      learners
+                    </span>
+
+                    <span>
+                      <BookOpen
+                        size={14}
+                      />
+
+                      {
+                        course.lessons
+                      }{' '}
+                      lessons
+                    </span>
+
+                    <span>
+                      <Star
+                        size={14}
+                        fill={
+                          course.rating >
+                          0
+                            ? 'currentColor'
+                            : 'none'
+                        }
+                      />
+
+                      {course.rating >
+                      0
+                        ? course.rating
+                        : 'New'}
+                    </span>
+                  </div>
+
+                  <div className="instructor-course-progress">
+                    <div>
+                      <span>
+                        Completion
+                      </span>
+
+                      <strong>
+                        {
+                          course.completionRate
+                        }
+                        %
+                      </strong>
+                    </div>
+
+                    <div className="instructor-progress-track">
+                      <div
+                        style={{
+                          width: `${course.completionRate}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="instructor-course-footer">
+                    <span>
+                      Updated{' '}
+                      {
+                        course.updatedAt
+                      }
+                    </span>
+
+                    <button
+                      type="button"
+                      className={
+                        course.status ===
+                        'published'
+                          ? 'unpublish'
+                          : 'publish'
+                      }
+                      onClick={() =>
+                        handleCourseStatus(
+                          course.id,
+                        )
+                      }
+                    >
+                      {course.status ===
+                      'published'
+                        ? 'Move to draft'
+                        : 'Publish course'}
+                    </button>
+                  </div>
+                </article>
+              ),
+            )}
           </div>
         </section>
+      )}
+
+      {activeTab ===
+        'materials' && (
+        <InstructorMaterials />
       )}
 
       {activeTab === 'reviews' && (
@@ -507,11 +872,13 @@ function InstructorDashboard() {
                 Assignment reviews
               </span>
 
-              <h2>Student submissions</h2>
+              <h2>
+                Student submissions
+              </h2>
 
               <p>
-                Review submitted work and update
-                assessment status.
+                Review submitted work and
+                update assessment status.
               </p>
             </div>
 
@@ -519,99 +886,651 @@ function InstructorDashboard() {
               <strong>
                 {pendingReviews}
               </strong>
-              <span>Pending</span>
+
+              <span>
+                Pending
+              </span>
             </div>
           </div>
 
           <div className="instructor-review-list">
-            {reviews.map((review) => (
-              <article
-                className="instructor-review-card"
-                key={review.id}
-              >
-                <div className="review-student-avatar large">
-                  {review.studentName
-                    .charAt(0)
-                    .toUpperCase()}
-                </div>
+            {reviews.map(
+              (review) => (
+                <article
+                  className="instructor-review-card"
+                  key={review.id}
+                >
+                  <div className="review-student-avatar large">
+                    {review.studentName
+                      .charAt(0)
+                      .toUpperCase()}
+                  </div>
 
-                <div className="review-main-info">
-                  <div>
-                    <span>
-                      {review.courseTitle}
+                  <div className="review-main-info">
+                    <div>
+                      <span>
+                        {
+                          review.courseTitle
+                        }
+                      </span>
+
+                      <h3>
+                        {
+                          review.assignmentTitle
+                        }
+                      </h3>
+
+                      <p>
+                        Submitted by{' '}
+                        <strong>
+                          {
+                            review.studentName
+                          }
+                        </strong>{' '}
+                        ·{' '}
+                        {
+                          review.submittedAt
+                        }
+                      </p>
+                    </div>
+
+                    <span
+                      className={`review-status ${review.status}`}
+                    >
+                      {review.status ===
+                        'pending' && (
+                        <Clock3
+                          size={13}
+                        />
+                      )}
+
+                      {review.status ===
+                        'approved' && (
+                        <CheckCircle2
+                          size={13}
+                        />
+                      )}
+
+                      {review.status ===
+                        'changes-requested' && (
+                        <XCircle
+                          size={13}
+                        />
+                      )}
+
+                      {review.status ===
+                      'changes-requested'
+                        ? 'Changes requested'
+                        : review.status}
                     </span>
-
-                    <h3>
-                      {review.assignmentTitle}
-                    </h3>
-
-                    <p>
-                      Submitted by{' '}
-                      <strong>
-                        {review.studentName}
-                      </strong>{' '}
-                      · {review.submittedAt}
-                    </p>
                   </div>
 
-                  <span
-                    className={`review-status ${review.status}`}
-                  >
-                    {review.status === 'pending' && (
-                      <Clock3 size={13} />
-                    )}
+                  {review.status ===
+                    'pending' && (
+                    <div className="review-actions">
+                      <button
+                        type="button"
+                        className="request-changes"
+                        onClick={() =>
+                          handleReview(
+                            review.id,
+                            'changes-requested',
+                          )
+                        }
+                      >
+                        <XCircle
+                          size={15}
+                        />
+                        Request changes
+                      </button>
 
-                    {review.status === 'approved' && (
-                      <CheckCircle2 size={13} />
-                    )}
-
-                    {review.status ===
-                      'changes-requested' && (
-                      <XCircle size={13} />
-                    )}
-
-                    {review.status ===
-                    'changes-requested'
-                      ? 'Changes requested'
-                      : review.status}
-                  </span>
-                </div>
-
-                {review.status === 'pending' && (
-                  <div className="review-actions">
-                    <button
-                      type="button"
-                      className="request-changes"
-                      onClick={() =>
-                        handleReview(
-                          review.id,
-                          'changes-requested',
-                        )
-                      }
-                    >
-                      <XCircle size={15} />
-                      Request changes
-                    </button>
-
-                    <button
-                      type="button"
-                      className="approve-review"
-                      onClick={() =>
-                        handleReview(
-                          review.id,
-                          'approved',
-                        )
-                      }
-                    >
-                      <CheckCircle2 size={15} />
-                      Approve
-                    </button>
-                  </div>
-                )}
-              </article>
-            ))}
+                      <button
+                        type="button"
+                        className="approve-review"
+                        onClick={() =>
+                          handleReview(
+                            review.id,
+                            'approved',
+                          )
+                        }
+                      >
+                        <CheckCircle2
+                          size={15}
+                        />
+                        Approve
+                      </button>
+                    </div>
+                  )}
+                </article>
+              ),
+            )}
           </div>
         </section>
+      )}
+
+      {activeTab ===
+        'ai-quizzes' && (
+        <section className="ai-quiz-review-section">
+          <div className="instructor-section-heading">
+            <div>
+              <span className="eyebrow">
+                AI-generated assessments
+              </span>
+
+              <h2>
+                Quiz review queue
+              </h2>
+
+              <p>
+                Review automatically
+                generated quiz drafts
+                before making them
+                available to students.
+              </p>
+            </div>
+
+            <div className="course-status-summary">
+              <strong>
+                {pendingAIQuizzes}
+              </strong>
+
+              <span>
+                Pending
+              </span>
+            </div>
+          </div>
+
+          <div className="ai-quiz-review-list">
+            {aiQuizzes.map(
+              (quiz) => (
+                <article
+                  className="ai-quiz-review-card"
+                  key={quiz.id}
+                >
+                  <div className="ai-quiz-review-header">
+                    <div className="ai-quiz-review-title">
+                      <div className="ai-quiz-review-icon">
+                        <Sparkles
+                          size={21}
+                        />
+                      </div>
+
+                      <div>
+                        <span>
+                          {
+                            quiz.courseTitle
+                          }
+                        </span>
+
+                        <h3>
+                          {quiz.title}
+                        </h3>
+
+                        <p>
+                          Generated from{' '}
+                          <strong>
+                            {
+                              quiz.lectureTitle
+                            }
+                          </strong>
+                          {' · '}
+                          {
+                            quiz.generatedAt
+                          }
+                        </p>
+                      </div>
+                    </div>
+
+                    <span
+                      className={`ai-quiz-review-status ${quiz.status}`}
+                    >
+                      {quiz.status ===
+                        'pending' && (
+                        <Clock3
+                          size={13}
+                        />
+                      )}
+
+                      {quiz.status ===
+                        'approved' && (
+                        <CheckCircle2
+                          size={13}
+                        />
+                      )}
+
+                      {quiz.status ===
+                        'changes-requested' && (
+                        <XCircle
+                          size={13}
+                        />
+                      )}
+
+                      {quiz.status ===
+                      'changes-requested'
+                        ? 'Changes requested'
+                        : quiz.status}
+                    </span>
+                  </div>
+
+                  <div className="ai-generated-label">
+                    <Sparkles
+                      size={13}
+                    />
+
+                    AI-generated draft ·{' '}
+                    {
+                      quiz.questions
+                        .length
+                    }{' '}
+                    questions
+                  </div>
+
+                  <div className="ai-quiz-question-list">
+                    {quiz.questions.map(
+                      (
+                        question,
+                        index,
+                      ) => (
+                        <div
+                          className="ai-quiz-question-preview"
+                          key={
+                            question.id
+                          }
+                        >
+                          <div className="ai-quiz-question-number">
+                            {index +
+                              1}
+                          </div>
+
+                          <div className="ai-quiz-question-body">
+                            <h4>
+                              {
+                                question.question
+                              }
+                            </h4>
+
+                            <div className="ai-quiz-option-preview">
+                              {question.options.map(
+                                (
+                                  option,
+                                  optionIndex,
+                                ) => (
+                                  <span
+                                    className={
+                                      optionIndex ===
+                                      question.correctAnswer
+                                        ? 'correct'
+                                        : ''
+                                    }
+                                    key={
+                                      option
+                                    }
+                                  >
+                                    <b>
+                                      {String.fromCharCode(
+                                        65 +
+                                          optionIndex,
+                                      )}
+                                    </b>
+
+                                    {
+                                      option
+                                    }
+
+                                    {optionIndex ===
+                                      question.correctAnswer && (
+                                      <CheckCircle2
+                                        size={
+                                          12
+                                        }
+                                      />
+                                    )}
+                                  </span>
+                                ),
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ),
+                    )}
+                  </div>
+
+                  {quiz.status ===
+                    'pending' ? (
+                    <div className="ai-quiz-review-actions">
+                      <button
+                        type="button"
+                        className="request-changes"
+                        onClick={() =>
+                          handleAIQuizReview(
+                            quiz.id,
+                            'changes-requested',
+                          )
+                        }
+                      >
+                        <XCircle
+                          size={15}
+                        />
+                        Request changes
+                      </button>
+
+                      <button
+                        type="button"
+                        className="approve-review"
+                        onClick={() =>
+                          handleAIQuizReview(
+                            quiz.id,
+                            'approved',
+                          )
+                        }
+                      >
+                        <CheckCircle2
+                          size={15}
+                        />
+                        Approve quiz
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="ai-quiz-reviewed-message">
+                      {quiz.status ===
+                      'approved' ? (
+                        <CheckCircle2
+                          size={15}
+                        />
+                      ) : (
+                        <XCircle
+                          size={15}
+                        />
+                      )}
+
+                      {quiz.status ===
+                      'approved'
+                        ? 'Quiz approved for student use.'
+                        : 'Quiz returned for changes.'}
+                    </div>
+                  )}
+                </article>
+              ),
+            )}
+          </div>
+        </section>
+      )}
+
+      {showCreateCourse && (
+        <div
+          className="course-modal-backdrop"
+          role="presentation"
+          onMouseDown={(
+            event,
+          ) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              closeCreateCourse();
+            }
+          }}
+        >
+          <div
+            className="course-create-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-course-title"
+          >
+            <div className="course-create-modal-header">
+              <div>
+                <span className="eyebrow">
+                  Course authoring
+                </span>
+
+                <h2 id="create-course-title">
+                  Create new course
+                </h2>
+
+                <p>
+                  Add the basic course
+                  information. New courses
+                  begin as drafts.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="course-modal-close"
+                onClick={
+                  closeCreateCourse
+                }
+                aria-label="Close create course form"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="course-create-form">
+              <label className="course-form-field course-form-full">
+                <span>
+                  Course title
+                </span>
+
+                <input
+                  type="text"
+                  value={
+                    courseForm.title
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setCourseForm(
+                      (
+                        current,
+                      ) => ({
+                        ...current,
+                        title:
+                          event
+                            .target
+                            .value,
+                      }),
+                    )
+                  }
+                  placeholder="e.g. Advanced React Patterns"
+                />
+              </label>
+
+              <label className="course-form-field course-form-full">
+                <span>
+                  Description
+                </span>
+
+                <textarea
+                  value={
+                    courseForm.description
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setCourseForm(
+                      (
+                        current,
+                      ) => ({
+                        ...current,
+                        description:
+                          event
+                            .target
+                            .value,
+                      }),
+                    )
+                  }
+                  placeholder="Describe what students will learn..."
+                  rows={4}
+                />
+              </label>
+
+              <label className="course-form-field">
+                <span>
+                  Category
+                </span>
+
+                <select
+                  value={
+                    courseForm.category
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setCourseForm(
+                      (
+                        current,
+                      ) => ({
+                        ...current,
+                        category:
+                          event
+                            .target
+                            .value,
+                      }),
+                    )
+                  }
+                >
+                  <option value="Web Development">
+                    Web Development
+                  </option>
+
+                  <option value="Data Science">
+                    Data Science
+                  </option>
+
+                  <option value="Artificial Intelligence">
+                    Artificial
+                    Intelligence
+                  </option>
+
+                  <option value="Design">
+                    Design
+                  </option>
+
+                  <option value="Programming">
+                    Programming
+                  </option>
+                </select>
+              </label>
+
+              <label className="course-form-field">
+                <span>
+                  Pricing tier
+                </span>
+
+                <select
+                  value={
+                    courseForm.pricingTier
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setCourseForm(
+                      (
+                        current,
+                      ) => ({
+                        ...current,
+                        pricingTier:
+                          event
+                            .target
+                            .value as PricingTier,
+                      }),
+                    )
+                  }
+                >
+                  <option value="Free">
+                    Free
+                  </option>
+
+                  <option value="Standard">
+                    Standard
+                  </option>
+
+                  <option value="Premium">
+                    Premium
+                  </option>
+                </select>
+              </label>
+
+              <label className="course-form-field course-form-full">
+                <span>
+                  Thumbnail URL
+                </span>
+
+                <input
+                  type="url"
+                  value={
+                    courseForm.thumbnail
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setCourseForm(
+                      (
+                        current,
+                      ) => ({
+                        ...current,
+                        thumbnail:
+                          event
+                            .target
+                            .value,
+                      }),
+                    )
+                  }
+                  placeholder="https://example.com/course-thumbnail.jpg"
+                />
+
+                <small>
+                  Optional for this
+                  frontend demo.
+                </small>
+              </label>
+
+              {courseForm.thumbnail.trim() && (
+                <div className="course-thumbnail-preview course-form-full">
+                  <span>
+                    Thumbnail preview
+                  </span>
+
+                  <img
+                    src={
+                      courseForm.thumbnail
+                    }
+                    alt="Course thumbnail preview"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="course-create-modal-footer">
+              <button
+                type="button"
+                className="course-create-cancel"
+                onClick={
+                  closeCreateCourse
+                }
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="course-create-submit"
+                disabled={
+                  !courseForm.title.trim() ||
+                  !courseForm.description.trim() ||
+                  !courseForm.category.trim()
+                }
+                onClick={
+                  handleCreateCourse
+                }
+              >
+                <Plus size={15} />
+                Create draft
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </section>
   );

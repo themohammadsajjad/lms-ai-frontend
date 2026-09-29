@@ -3,16 +3,24 @@ import {
   BadgeCheck,
   CheckCircle2,
   Clock3,
+  Download,
   Flame,
   Medal,
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
+import {
+  PDFDocument,
+  StandardFonts,
+  rgb,
+} from 'pdf-lib';
 import { useState } from 'react';
 import {
   badges,
   certificates,
+  type Certificate,
 } from '../data/engagementData';
+import { authService } from '../services/authService';
 import { engagementService } from '../services/engagementService';
 
 function Certificates() {
@@ -26,22 +34,273 @@ function Certificates() {
     (certificate) => certificate.status === 'in-progress',
   );
 
-  const earnedBadges = badges.filter((badge) => badge.earned);
+  const earnedBadges = badges.filter(
+    (badge) => badge.earned,
+  );
 
-  function handleViewCertificate(certificateId: string) {
-    engagementService.markCertificateViewed(certificateId);
+  function handleViewCertificate(
+    certificateId: string,
+  ) {
+    engagementService.markCertificateViewed(
+      certificateId,
+    );
+
     setVersion((value) => value + 1);
+  }
+
+  async function handleDownloadCertificate(
+    certificate: Certificate,
+  ) {
+    const user = authService.getCurrentUser();
+
+    const studentName =
+      user?.name || 'VertexLearn Student';
+
+    const pdfDocument =
+      await PDFDocument.create();
+
+    const page = pdfDocument.addPage([
+      842,
+      595,
+    ]);
+
+    const regularFont =
+      await pdfDocument.embedFont(
+        StandardFonts.Helvetica,
+      );
+
+    const boldFont =
+      await pdfDocument.embedFont(
+        StandardFonts.HelveticaBold,
+      );
+
+    const width = page.getWidth();
+    const height = page.getHeight();
+
+    const purple = rgb(
+      0.4,
+      0.35,
+      0.85,
+    );
+
+    const navy = rgb(
+      0.08,
+      0.09,
+      0.18,
+    );
+
+    const gray = rgb(
+      0.38,
+      0.4,
+      0.48,
+    );
+
+    function drawCenteredText(
+      text: string,
+      y: number,
+      size: number,
+      font = regularFont,
+      color = navy,
+    ) {
+      const textWidth =
+        font.widthOfTextAtSize(
+          text,
+          size,
+        );
+
+      page.drawText(text, {
+        x: (width - textWidth) / 2,
+        y,
+        size,
+        font,
+        color,
+      });
+    }
+
+    page.drawRectangle({
+      x: 20,
+      y: 20,
+      width: width - 40,
+      height: height - 40,
+      borderWidth: 4,
+      borderColor: purple,
+    });
+
+    page.drawRectangle({
+      x: 32,
+      y: 32,
+      width: width - 64,
+      height: height - 64,
+      borderWidth: 1,
+      borderColor: rgb(
+        0.78,
+        0.76,
+        0.92,
+      ),
+    });
+
+    drawCenteredText(
+      'VERTEXLEARN',
+      height - 100,
+      28,
+      boldFont,
+      purple,
+    );
+
+    drawCenteredText(
+      'CERTIFICATE OF COMPLETION',
+      height - 155,
+      20,
+      boldFont,
+      navy,
+    );
+
+    drawCenteredText(
+      'This certificate is proudly presented to',
+      height - 205,
+      12,
+      regularFont,
+      gray,
+    );
+
+    drawCenteredText(
+      studentName,
+      height - 250,
+      26,
+      boldFont,
+      navy,
+    );
+
+    drawCenteredText(
+      'for successfully completing',
+      height - 295,
+      12,
+      regularFont,
+      gray,
+    );
+
+    drawCenteredText(
+      certificate.courseTitle,
+      height - 335,
+      22,
+      boldFont,
+      purple,
+    );
+
+    drawCenteredText(
+      `Issued: ${certificate.issuedDate}`,
+      height - 395,
+      11,
+      regularFont,
+      gray,
+    );
+
+    drawCenteredText(
+      `Credential ID: ${certificate.credentialId}`,
+      height - 420,
+      11,
+      regularFont,
+      gray,
+    );
+
+    drawCenteredText(
+      'VertexLearn Learning Platform',
+      85,
+      11,
+      boldFont,
+      navy,
+    );
+
+    drawCenteredText(
+      'Achievement verified through the VertexLearn demo learning experience.',
+      62,
+      9,
+      regularFont,
+      gray,
+    );
+
+    const pdfBytes =
+      await pdfDocument.save();
+
+    const buffer = new ArrayBuffer(
+      pdfBytes.byteLength,
+    );
+
+    new Uint8Array(buffer).set(
+      pdfBytes,
+    );
+
+    const pdfBlob = new Blob(
+      [buffer],
+      {
+        type: 'application/pdf',
+      },
+    );
+
+    const downloadUrl =
+      URL.createObjectURL(
+        pdfBlob,
+      );
+
+    const safeCourseName =
+      certificate.courseTitle
+        .toLowerCase()
+        .replace(
+          /[^a-z0-9]+/g,
+          '-',
+        )
+        .replace(
+          /^-|-$/g,
+          '',
+        );
+
+    const link =
+      document.createElement('a');
+
+    link.href = downloadUrl;
+
+    link.download =
+      `${safeCourseName}-certificate.pdf`;
+
+    document.body.appendChild(
+      link,
+    );
+
+    link.click();
+
+    link.remove();
+
+    setTimeout(() => {
+      URL.revokeObjectURL(
+        downloadUrl,
+      );
+    }, 1000);
+
+    engagementService.markCertificateViewed(
+      certificate.id,
+    );
+
+    setVersion(
+      (value) => value + 1,
+    );
   }
 
   return (
     <section className="certificates-page">
       <div className="dashboard-intro">
         <div>
-          <span className="eyebrow">Achievements</span>
-          <h1>Certificates & badges</h1>
+          <span className="eyebrow">
+            Achievements
+          </span>
+
+          <h1>
+            Certificates & badges
+          </h1>
+
           <p>
-            Track your learning milestones, earned credentials and
-            achievement progress.
+            Track your learning milestones,
+            earned credentials and achievement
+            progress.
           </p>
         </div>
 
@@ -51,8 +310,13 @@ function Certificates() {
           </div>
 
           <section>
-            <strong>{earnedCertificates.length}</strong>
-            <span>Certificates earned</span>
+            <strong>
+              {earnedCertificates.length}
+            </strong>
+
+            <span>
+              Certificates earned
+            </span>
           </section>
         </div>
       </div>
@@ -64,21 +328,39 @@ function Certificates() {
           </div>
 
           <div>
-            <span>Certificates</span>
-            <strong>{earnedCertificates.length}</strong>
-            <small>Completed credentials</small>
+            <span>
+              Certificates
+            </span>
+
+            <strong>
+              {earnedCertificates.length}
+            </strong>
+
+            <small>
+              Completed credentials
+            </small>
           </div>
         </article>
 
         <article>
           <div className="achievement-stat-icon green">
-            <BadgeCheck size={20} />
+            <BadgeCheck
+              size={20}
+            />
           </div>
 
           <div>
-            <span>Badges earned</span>
-            <strong>{earnedBadges.length}</strong>
-            <small>Learning achievements</small>
+            <span>
+              Badges earned
+            </span>
+
+            <strong>
+              {earnedBadges.length}
+            </strong>
+
+            <small>
+              Learning achievements
+            </small>
           </div>
         </article>
 
@@ -88,21 +370,39 @@ function Certificates() {
           </div>
 
           <div>
-            <span>Current streak</span>
-            <strong>7 days</strong>
-            <small>Keep your momentum</small>
+            <span>
+              Current streak
+            </span>
+
+            <strong>
+              7 days
+            </strong>
+
+            <small>
+              Keep your momentum
+            </small>
           </div>
         </article>
 
         <article>
           <div className="achievement-stat-icon blue">
-            <ShieldCheck size={20} />
+            <ShieldCheck
+              size={20}
+            />
           </div>
 
           <div>
-            <span>Learning points</span>
-            <strong>1,480</strong>
-            <small>Total achievement score</small>
+            <span>
+              Learning points
+            </span>
+
+            <strong>
+              1,480
+            </strong>
+
+            <small>
+              Total achievement score
+            </small>
           </div>
         </article>
       </div>
@@ -110,114 +410,202 @@ function Certificates() {
       <section className="certificate-section">
         <div className="section-heading">
           <div>
-            <h2>Your certificates</h2>
+            <h2>
+              Your certificates
+            </h2>
+
             <p>
-              Credentials earned by completing learning paths.
+              Credentials earned by
+              completing learning paths.
             </p>
           </div>
         </div>
 
         <div className="certificate-grid">
-          {earnedCertificates.map((certificate, index) => {
-            const viewed =
-              engagementService.hasViewedCertificate(
-                certificate.id,
-              );
+          {earnedCertificates.map(
+            (
+              certificate,
+              index,
+            ) => {
+              const viewed =
+                engagementService.hasViewedCertificate(
+                  certificate.id,
+                );
 
-            return (
-              <article
-                className={`certificate-card certificate-${index + 1}`}
-                key={certificate.id}
-              >
-                <div className="certificate-card-top">
-                  <div className="certificate-logo">
-                    <Award size={23} />
-                  </div>
-
-                  <span className="certificate-earned-badge">
-                    <CheckCircle2 size={13} />
-                    Earned
-                  </span>
-                </div>
-
-                <div className="certificate-content">
-                  <span>Certificate of completion</span>
-
-                  <h3>{certificate.courseTitle}</h3>
-
-                  <p>
-                    Awarded for successfully completing all required
-                    learning activities and assessments.
-                  </p>
-                </div>
-
-                <div className="certificate-details">
-                  <div>
-                    <span>Issued</span>
-                    <strong>{certificate.issuedDate}</strong>
-                  </div>
-
-                  <div>
-                    <span>Credential ID</span>
-                    <strong>{certificate.credentialId}</strong>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleViewCertificate(certificate.id)
+              return (
+                <article
+                  className={`certificate-card certificate-${
+                    index + 1
+                  }`}
+                  key={
+                    certificate.id
                   }
                 >
-                  <Award size={15} />
-                  {viewed
-                    ? 'Certificate viewed'
-                    : 'View certificate'}
-                </button>
-              </article>
-            );
-          })}
+                  <div className="certificate-card-top">
+                    <div className="certificate-logo">
+                      <Award
+                        size={23}
+                      />
+                    </div>
+
+                    <span className="certificate-earned-badge">
+                      <CheckCircle2
+                        size={13}
+                      />
+                      Earned
+                    </span>
+                  </div>
+
+                  <div className="certificate-content">
+                    <span>
+                      Certificate of
+                      completion
+                    </span>
+
+                    <h3>
+                      {
+                        certificate.courseTitle
+                      }
+                    </h3>
+
+                    <p>
+                      Awarded for
+                      successfully completing
+                      all required learning
+                      activities and
+                      assessments.
+                    </p>
+                  </div>
+
+                  <div className="certificate-details">
+                    <div>
+                      <span>
+                        Issued
+                      </span>
+
+                      <strong>
+                        {
+                          certificate.issuedDate
+                        }
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Credential ID
+                      </span>
+
+                      <strong>
+                        {
+                          certificate.credentialId
+                        }
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="certificate-actions">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleViewCertificate(
+                          certificate.id,
+                        )
+                      }
+                    >
+                      <Award
+                        size={15}
+                      />
+
+                      {viewed
+                        ? 'Certificate viewed'
+                        : 'View certificate'}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="certificate-download-button"
+                      onClick={() =>
+                        handleDownloadCertificate(
+                          certificate,
+                        )
+                      }
+                    >
+                      <Download
+                        size={15}
+                      />
+
+                      Download PDF
+                    </button>
+                  </div>
+                </article>
+              );
+            },
+          )}
         </div>
       </section>
 
-      {inProgressCertificates.length > 0 && (
+      {inProgressCertificates.length >
+        0 && (
         <section className="certificate-progress-section">
           <div className="section-heading">
             <div>
-              <h2>In progress</h2>
+              <h2>
+                In progress
+              </h2>
+
               <p>
-                Complete the remaining learning activities to unlock
-                your certificate.
+                Complete the remaining
+                learning activities to
+                unlock your certificate.
               </p>
             </div>
           </div>
 
           <div className="certificate-progress-list">
-            {inProgressCertificates.map((certificate) => (
-              <article
-                className="certificate-progress-card"
-                key={certificate.id}
-              >
-                <div className="certificate-progress-icon">
-                  <Clock3 size={21} />
-                </div>
-
-                <div className="certificate-progress-info">
-                  <span>Certificate in progress</span>
-                  <h3>{certificate.courseTitle}</h3>
-
-                  <div className="certificate-progress-track">
-                    <div
-                      style={{
-                        width: `${certificate.progress}%`,
-                      }}
+            {inProgressCertificates.map(
+              (certificate) => (
+                <article
+                  className="certificate-progress-card"
+                  key={
+                    certificate.id
+                  }
+                >
+                  <div className="certificate-progress-icon">
+                    <Clock3
+                      size={21}
                     />
                   </div>
-                </div>
 
-                <strong>{certificate.progress}%</strong>
-              </article>
-            ))}
+                  <div className="certificate-progress-info">
+                    <span>
+                      Certificate in
+                      progress
+                    </span>
+
+                    <h3>
+                      {
+                        certificate.courseTitle
+                      }
+                    </h3>
+
+                    <div className="certificate-progress-track">
+                      <div
+                        style={{
+                          width: `${certificate.progress}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <strong>
+                    {
+                      certificate.progress
+                    }
+                    %
+                  </strong>
+                </article>
+              ),
+            )}
           </div>
         </section>
       )}
@@ -225,58 +613,93 @@ function Certificates() {
       <section className="badges-section">
         <div className="section-heading">
           <div>
-            <h2>Achievement badges</h2>
+            <h2>
+              Achievement badges
+            </h2>
+
             <p>
-              Milestones earned through learning activity and progress.
+              Milestones earned through
+              learning activity and
+              progress.
             </p>
           </div>
 
           <span className="badge-count">
-            {earnedBadges.length}/{badges.length} unlocked
+            {earnedBadges.length}/
+            {badges.length} unlocked
           </span>
         </div>
 
         <div className="badge-grid">
-          {badges.map((badge, index) => (
-            <article
-              className={`badge-card ${
-                badge.earned ? 'earned' : 'locked'
-              }`}
-              key={badge.id}
-            >
-              <div
-                className={`badge-icon badge-icon-${(index % 4) + 1}`}
+          {badges.map(
+            (
+              badge,
+              index,
+            ) => (
+              <article
+                className={`badge-card ${
+                  badge.earned
+                    ? 'earned'
+                    : 'locked'
+                }`}
+                key={
+                  badge.id
+                }
               >
-                {index % 3 === 0 ? (
-                  <Flame size={22} />
-                ) : index % 3 === 1 ? (
-                  <Medal size={22} />
-                ) : (
-                  <Sparkles size={22} />
-                )}
-              </div>
+                <div
+                  className={`badge-icon badge-icon-${
+                    (index % 4) + 1
+                  }`}
+                >
+                  {index % 3 ===
+                  0 ? (
+                    <Flame
+                      size={22}
+                    />
+                  ) : index % 3 ===
+                    1 ? (
+                    <Medal
+                      size={22}
+                    />
+                  ) : (
+                    <Sparkles
+                      size={22}
+                    />
+                  )}
+                </div>
 
-              <span>{badge.category}</span>
+                <span>
+                  {badge.category}
+                </span>
 
-              <h3>{badge.title}</h3>
+                <h3>
+                  {badge.title}
+                </h3>
 
-              <p>{badge.description}</p>
+                <p>
+                  {badge.description}
+                </p>
 
-              <div className="badge-state">
-                {badge.earned ? (
-                  <>
-                    <CheckCircle2 size={14} />
-                    Unlocked
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck size={14} />
-                    Locked
-                  </>
-                )}
-              </div>
-            </article>
-          ))}
+                <div className="badge-state">
+                  {badge.earned ? (
+                    <>
+                      <CheckCircle2
+                        size={14}
+                      />
+                      Unlocked
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck
+                        size={14}
+                      />
+                      Locked
+                    </>
+                  )}
+                </div>
+              </article>
+            ),
+          )}
         </div>
       </section>
     </section>

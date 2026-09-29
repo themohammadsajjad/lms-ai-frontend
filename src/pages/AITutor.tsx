@@ -28,7 +28,7 @@ function AITutor() {
     tutorKnowledge[0]?.courseId ?? '',
   );
   const [mode, setMode] =
-    useState<TutorMode>('standard');
+    useState<TutorMode>('intermediate');
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState<
     TutorMessage[]
@@ -168,15 +168,15 @@ function AITutor() {
               <button
                 type="button"
                 className={
-                  mode === 'standard'
+                  mode === 'intermediate'
                     ? 'active'
                     : ''
                 }
                 onClick={() =>
-                  setMode('standard')
+                  setMode('intermediate')
                 }
               >
-                <strong>Standard</strong>
+                <strong>Intermediate</strong>
                 <span>
                   Balanced explanations and context
                 </span>

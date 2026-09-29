@@ -1,4 +1,7 @@
-export type TutorMode = 'beginner' | 'standard' | 'advanced';
+export type TutorMode =
+  | 'beginner'
+  | 'intermediate'
+  | 'advanced';
 
 export interface TutorSource {
   id: string;

@@ -8,11 +8,19 @@ export interface Assignment {
   points: number;
 }
 
+export type QuizQuestionType =
+  | 'single'
+  | 'multiple'
+  | 'short';
+
 export interface QuizQuestion {
   id: string;
   question: string;
-  options: string[];
-  correctAnswer: number;
+  type: QuizQuestionType;
+  options?: string[];
+  correctAnswer?: number;
+  correctAnswers?: number[];
+  acceptedAnswers?: string[];
 }
 
 export interface Quiz {
@@ -67,7 +75,9 @@ export const quizzes: Quiz[] = [
     questions: [
       {
         id: 'rq1',
-        question: 'What is a React component?',
+        type: 'single',
+        question:
+          'What is a React component?',
         options: [
           'A reusable piece of UI',
           'A database table',
@@ -78,7 +88,33 @@ export const quizzes: Quiz[] = [
       },
       {
         id: 'rq2',
-        question: 'Which hook is commonly used for component state?',
+        type: 'multiple',
+        question:
+          'Which of these are React hooks?',
+        options: [
+          'useState',
+          'useEffect',
+          'useDatabase',
+          'useStyleSheet',
+        ],
+        correctAnswers: [0, 1],
+      },
+      {
+        id: 'rq3',
+        type: 'short',
+        question:
+          'What do we call data passed from a parent component to a child component?',
+        acceptedAnswers: [
+          'props',
+          'prop',
+          'properties',
+        ],
+      },
+      {
+        id: 'rq4',
+        type: 'single',
+        question:
+          'Which hook is commonly used for component state?',
         options: [
           'useRoute',
           'useState',
@@ -86,17 +122,6 @@ export const quizzes: Quiz[] = [
           'useStyle',
         ],
         correctAnswer: 1,
-      },
-      {
-        id: 'rq3',
-        question: 'Props are mainly used to:',
-        options: [
-          'Pass data to components',
-          'Create databases',
-          'Install packages',
-          'Compile TypeScript',
-        ],
-        correctAnswer: 0,
       },
     ],
   },
@@ -109,7 +134,9 @@ export const quizzes: Quiz[] = [
     questions: [
       {
         id: 'mq1',
-        question: 'Supervised learning uses:',
+        type: 'single',
+        question:
+          'Supervised learning uses:',
         options: [
           'Labeled training data',
           'Only images',
@@ -120,25 +147,28 @@ export const quizzes: Quiz[] = [
       },
       {
         id: 'mq2',
-        question: 'Regression is generally used to predict:',
+        type: 'multiple',
+        question:
+          'Which of these can be used to evaluate a regression model?',
         options: [
-          'Continuous values',
-          'CSS classes',
-          'File names',
-          'Passwords',
+          'Mean Absolute Error',
+          'Mean Squared Error',
+          'Screen resolution',
+          'CSS specificity',
         ],
-        correctAnswer: 0,
+        correctAnswers: [0, 1],
       },
       {
         id: 'mq3',
-        question: 'Model evaluation helps us understand:',
-        options: [
-          'How well a model performs',
-          'How large the monitor is',
-          'Which editor is installed',
-          'Which browser is open',
+        type: 'short',
+        question:
+          'What type of values does regression generally predict?',
+        acceptedAnswers: [
+          'continuous',
+          'continuous values',
+          'numerical values',
+          'numeric values',
         ],
-        correctAnswer: 0,
       },
     ],
   },
