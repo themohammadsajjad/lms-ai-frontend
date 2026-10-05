@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   ChevronDown,
   CircleAlert,
+  FileText,
   Gauge,
   Lightbulb,
   RotateCcw,
@@ -13,17 +14,37 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { quizzes } from '../data/assessmentData';
+import { lessonsByCourse } from '../data/learningData';
+import {
+  getLectureTranscript,
+} from '../data/lectureTranscriptData';
 import { studyResources } from '../data/studyToolsData';
 import { assessmentService } from '../services/assessmentService';
 import { studyToolsService } from '../services/studyToolsService';
 import { topicMasteryService } from '../services/topicMasteryService';
 
+const initialCourseId =
+  studyResources[0]?.courseId ?? '';
+
 function StudyTools() {
   const [courseId, setCourseId] =
-    useState(
-      studyResources[0]?.courseId ??
-        '',
-    );
+    useState(initialCourseId);
+
+  const [
+    selectedLessonId,
+    setSelectedLessonId,
+  ] = useState(
+    lessonsByCourse[
+      initialCourseId
+    ]?.[0]?.id ?? '',
+  );
+
+  const [
+    generatedSummaryLessonId,
+    setGeneratedSummaryLessonId,
+  ] = useState<string | null>(
+    null,
+  );
 
   const [
     flippedCardId,
@@ -65,6 +86,32 @@ function StudyTools() {
 
   const activeResource =
     resource;
+
+  const courseLessons =
+    lessonsByCourse[
+      activeResource.courseId
+    ] ?? [];
+
+  const selectedLesson =
+    courseLessons.find(
+      (lesson) =>
+        lesson.id ===
+        selectedLessonId,
+    );
+
+  const selectedTranscript =
+    selectedLesson
+      ? getLectureTranscript(
+          selectedLesson.id,
+        )
+      : undefined;
+
+  const generatedSummary =
+    generatedSummaryLessonId ===
+      selectedLesson?.id &&
+    selectedTranscript
+      ? selectedTranscript.keyPoints
+      : null;
 
   const cardIds =
     activeResource.flashcards.map(
@@ -232,8 +279,47 @@ function StudyTools() {
   ) {
     setCourseId(value);
 
+    const firstLesson =
+      lessonsByCourse[
+        value
+      ]?.[0];
+
+    setSelectedLessonId(
+      firstLesson?.id ??
+        '',
+    );
+
+    setGeneratedSummaryLessonId(
+      null,
+    );
+
     setFlippedCardId(
       null,
+    );
+  }
+
+  function handleLessonChange(
+    value: string,
+  ) {
+    setSelectedLessonId(
+      value,
+    );
+
+    setGeneratedSummaryLessonId(
+      null,
+    );
+  }
+
+  function handleGenerateSummary() {
+    if (
+      !selectedLesson ||
+      !selectedTranscript
+    ) {
+      return;
+    }
+
+    setGeneratedSummaryLessonId(
+      selectedLesson.id,
     );
   }
 
@@ -274,8 +360,8 @@ function StudyTools() {
           </h1>
 
           <p>
-            Review course
-            summaries, practice
+            Summarize selected
+            lectures, practice
             with flashcards and
             follow recommendations
             based on your quiz
@@ -419,6 +505,225 @@ function StudyTools() {
           </div>
         </article>
       </div>
+
+      <article className="lecture-summary-card">
+        <div className="lecture-summary-heading">
+          <div className="lecture-summary-icon">
+            <FileText
+              size={22}
+            />
+          </div>
+
+          <div>
+            <span>
+              AI lecture summary
+            </span>
+
+            <h2>
+              Summarize a selected
+              lecture
+            </h2>
+
+            <p>
+              Choose a lecture and
+              generate key points from
+              its course transcript.
+            </p>
+          </div>
+        </div>
+
+        <div className="lecture-summary-controls">
+          <label>
+            <span>
+              Lecture
+            </span>
+
+            <div className="lecture-select-wrapper">
+              <select
+                value={
+                  selectedLessonId
+                }
+                onChange={(
+                  event,
+                ) =>
+                  handleLessonChange(
+                    event.target
+                      .value,
+                  )
+                }
+                disabled={
+                  courseLessons.length ===
+                  0
+                }
+              >
+                {courseLessons.length >
+                0 ? (
+                  courseLessons.map(
+                    (lesson) => (
+                      <option
+                        key={
+                          lesson.id
+                        }
+                        value={
+                          lesson.id
+                        }
+                      >
+                        {lesson.module}{' '}
+                        —{' '}
+                        {
+                          lesson.title
+                        }
+                      </option>
+                    ),
+                  )
+                ) : (
+                  <option value="">
+                    No lectures available
+                  </option>
+                )}
+              </select>
+
+              <ChevronDown
+                size={15}
+              />
+            </div>
+          </label>
+
+          <button
+            type="button"
+            className="generate-lecture-summary-button"
+            disabled={
+              !selectedLesson ||
+              !selectedTranscript
+            }
+            onClick={
+              handleGenerateSummary
+            }
+          >
+            <Sparkles
+              size={15}
+            />
+
+            Generate AI Summary
+          </button>
+        </div>
+
+        {selectedLesson && (
+          <div className="selected-lecture-context">
+            <div>
+              <span>
+                Selected lecture
+              </span>
+
+              <strong>
+                {
+                  selectedLesson.title
+                }
+              </strong>
+
+              <small>
+                {
+                  selectedLesson.module
+                }{' '}
+                ·{' '}
+                {
+                  selectedLesson.duration
+                }
+              </small>
+            </div>
+
+            <span className="transcript-status">
+              {selectedTranscript
+                ? 'Transcript ready'
+                : 'Transcript unavailable'}
+            </span>
+          </div>
+        )}
+
+        {generatedSummary ? (
+          <div className="generated-lecture-summary">
+            <div className="generated-summary-header">
+              <div>
+                <span>
+                  AI-generated key
+                  points
+                </span>
+
+                <h3>
+                  {
+                    selectedLesson?.title
+                  }
+                </h3>
+              </div>
+
+              <Sparkles
+                size={18}
+              />
+            </div>
+
+            <div className="generated-summary-points">
+              {generatedSummary.map(
+                (
+                  point,
+                  index,
+                ) => (
+                  <div
+                    key={
+                      point
+                    }
+                  >
+                    <span>
+                      {String(
+                        index +
+                          1,
+                      ).padStart(
+                        2,
+                        '0',
+                      )}
+                    </span>
+
+                    <p>
+                      {
+                        point
+                      }
+                    </p>
+                  </div>
+                ),
+              )}
+            </div>
+
+            <div className="generated-summary-source">
+              <FileText
+                size={14}
+              />
+
+              Generated from the
+              selected lecture
+              transcript
+            </div>
+          </div>
+        ) : (
+          <div className="lecture-summary-placeholder">
+            <Sparkles
+              size={20}
+            />
+
+            <div>
+              <strong>
+                {selectedTranscript
+                  ? 'Ready to summarize'
+                  : 'Summary unavailable'}
+              </strong>
+
+              <span>
+                {selectedTranscript
+                  ? 'Generate a concise set of key points from this lecture transcript.'
+                  : 'This lecture does not have transcript data in the frontend demo yet.'}
+              </span>
+            </div>
+          </div>
+        )}
+      </article>
 
       <article className="study-quiz-insight">
         <div className="study-quiz-insight-icon">
