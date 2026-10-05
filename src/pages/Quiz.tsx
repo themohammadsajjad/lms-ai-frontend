@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  BrainCircuit,
   CheckCircle2,
   RotateCcw,
   Trophy,
@@ -12,9 +13,11 @@ import {
 } from 'react-router-dom';
 import {
   quizzes,
+  type QuizDifficulty,
   type QuizQuestion,
 } from '../data/assessmentData';
 import { assessmentService } from '../services/assessmentService';
+import { topicMasteryService } from '../services/topicMasteryService';
 
 type AnswerValue =
   | number
@@ -30,25 +33,43 @@ function normalizeAnswer(
     .replace(/\s+/g, ' ');
 }
 
+function formatDifficulty(
+  difficulty: QuizDifficulty,
+) {
+  return (
+    difficulty
+      .charAt(0)
+      .toUpperCase() +
+    difficulty.slice(1)
+  );
+}
+
 function isQuestionCorrect(
   question: QuizQuestion,
-  answer: AnswerValue | undefined,
+  answer:
+    | AnswerValue
+    | undefined,
 ) {
   if (
-    question.type === 'single'
+    question.type ===
+    'single'
   ) {
     return (
-      typeof answer === 'number' &&
+      typeof answer ===
+        'number' &&
       answer ===
         question.correctAnswer
     );
   }
 
   if (
-    question.type === 'multiple'
+    question.type ===
+    'multiple'
   ) {
     if (
-      !Array.isArray(answer) ||
+      !Array.isArray(
+        answer,
+      ) ||
       !question.correctAnswers
     ) {
       return false;
@@ -57,43 +78,54 @@ function isQuestionCorrect(
     const selected = [
       ...answer,
     ].sort(
-      (a, b) => a - b,
+      (a, b) =>
+        a - b,
     );
 
     const correct = [
       ...question.correctAnswers,
     ].sort(
-      (a, b) => a - b,
+      (a, b) =>
+        a - b,
     );
 
     return (
       selected.length ===
         correct.length &&
       selected.every(
-        (value, index) =>
-          value === correct[index],
+        (
+          value,
+          index,
+        ) =>
+          value ===
+          correct[index],
       )
     );
   }
 
   if (
-    question.type === 'short'
+    question.type ===
+    'short'
   ) {
     if (
-      typeof answer !== 'string'
+      typeof answer !==
+      'string'
     ) {
       return false;
     }
 
     const normalized =
-      normalizeAnswer(answer);
+      normalizeAnswer(
+        answer,
+      );
 
     return (
       question.acceptedAnswers?.some(
         (accepted) =>
           normalizeAnswer(
             accepted,
-          ) === normalized,
+          ) ===
+          normalized,
       ) ?? false
     );
   }
@@ -105,12 +137,17 @@ function Quiz() {
   const { quizId } =
     useParams();
 
-  const quiz = quizzes.find(
-    (item) =>
-      item.id === quizId,
-  );
+  const quiz =
+    quizzes.find(
+      (item) =>
+        item.id ===
+        quizId,
+    );
 
-  const [answers, setAnswers] =
+  const [
+    answers,
+    setAnswers,
+  ] =
     useState<
       Record<
         string,
@@ -118,15 +155,33 @@ function Quiz() {
       >
     >({});
 
-  const [score, setScore] =
-    useState<number | null>(
-      null,
+  const [
+    score,
+    setScore,
+  ] =
+    useState<
+      number | null
+    >(null);
+
+  const [
+    quizDifficulty,
+    setQuizDifficulty,
+  ] =
+    useState<QuizDifficulty>(
+      () =>
+        quiz
+          ? topicMasteryService.getRecommendedDifficulty(
+              quiz.courseId,
+            )
+          : 'intermediate',
     );
 
   if (!quiz) {
     return (
       <section className="learning-empty-state">
-        <h1>Quiz not found</h1>
+        <h1>
+          Quiz not found
+        </h1>
 
         <Link to="/quizzes">
           Return to quizzes
@@ -135,20 +190,32 @@ function Quiz() {
     );
   }
 
-  const activeQuiz = quiz;
+  const activeQuiz =
+    quiz;
+
+  const activeQuestions =
+    activeQuiz.questions.filter(
+      (question) =>
+        question.difficulty ===
+        quizDifficulty,
+    );
 
   function isAnswered(
     question: QuizQuestion,
   ) {
     const answer =
-      answers[question.id];
+      answers[
+        question.id
+      ];
 
     if (
       question.type ===
       'single'
     ) {
-      return typeof answer ===
-        'number';
+      return (
+        typeof answer ===
+        'number'
+      );
     }
 
     if (
@@ -159,20 +226,21 @@ function Quiz() {
         Array.isArray(
           answer,
         ) &&
-        answer.length > 0
+        answer.length >
+          0
       );
     }
 
     return (
       typeof answer ===
         'string' &&
-      answer.trim().length >
-        0
+      answer.trim()
+        .length > 0
     );
   }
 
   const answeredCount =
-    activeQuiz.questions.filter(
+    activeQuestions.filter(
       isAnswered,
     ).length;
 
@@ -180,7 +248,9 @@ function Quiz() {
     questionId: string,
     optionIndex: number,
   ) {
-    if (score !== null) {
+    if (
+      score !== null
+    ) {
       return;
     }
 
@@ -197,7 +267,9 @@ function Quiz() {
     questionId: string,
     optionIndex: number,
   ) {
-    if (score !== null) {
+    if (
+      score !== null
+    ) {
       return;
     }
 
@@ -242,66 +314,81 @@ function Quiz() {
     questionId: string,
     value: string,
   ) {
-    if (score !== null) {
+    if (
+      score !== null
+    ) {
       return;
     }
 
     setAnswers(
       (current) => ({
         ...current,
-        [questionId]: value,
+        [questionId]:
+          value,
       }),
     );
   }
 
   function handleSubmit() {
     if (
+      activeQuestions.length ===
+        0 ||
       answeredCount !==
-      activeQuiz.questions
-        .length
+        activeQuestions.length
     ) {
       return;
     }
 
     const finalScore =
-      activeQuiz.questions.reduce(
+      activeQuestions.reduce(
         (
           total,
           question,
-        ) => {
-          return isQuestionCorrect(
+        ) =>
+          isQuestionCorrect(
             question,
             answers[
               question.id
             ],
           )
             ? total + 1
-            : total;
-        },
+            : total,
         0,
       );
 
     assessmentService.saveQuizAttempt(
       activeQuiz.id,
       finalScore,
-      activeQuiz.questions
-        .length,
+      activeQuestions.length,
     );
 
-    setScore(finalScore);
+    topicMasteryService.syncFromQuiz(
+      activeQuiz.courseId,
+    );
+
+    setScore(
+      finalScore,
+    );
   }
 
   function handleRetake() {
     setAnswers({});
     setScore(null);
+
+    setQuizDifficulty(
+      topicMasteryService.getRecommendedDifficulty(
+        activeQuiz.courseId,
+      ),
+    );
   }
 
   const percentage =
-    score !== null
+    score !== null &&
+    activeQuestions.length >
+      0
       ? Math.round(
           (score /
-            activeQuiz.questions
-              .length) *
+            activeQuestions.length) *
             100,
         )
       : 0;
@@ -315,6 +402,7 @@ function Quiz() {
         <ArrowLeft
           size={16}
         />
+
         Back to quizzes
       </Link>
 
@@ -333,9 +421,10 @@ function Quiz() {
           </h1>
 
           <p>
-            Complete the MCQ,
-            multi-select and
-            short-answer questions.
+            This quiz adapts
+            its difficulty
+            using your current
+            topic mastery.
           </p>
         </div>
 
@@ -343,8 +432,7 @@ function Quiz() {
           <strong>
             {answeredCount}/
             {
-              activeQuiz
-                .questions.length
+              activeQuestions.length
             }
           </strong>
 
@@ -354,7 +442,46 @@ function Quiz() {
         </div>
       </div>
 
-      {score !== null && (
+      <article className="quiz-adaptive-banner">
+        <div className="quiz-adaptive-icon">
+          <BrainCircuit
+            size={20}
+          />
+        </div>
+
+        <div>
+          <span>
+            Adaptive quiz
+          </span>
+
+          <h2>
+            {formatDifficulty(
+              quizDifficulty,
+            )}{' '}
+            difficulty
+          </h2>
+
+          <p>
+            Selected from your
+            current course
+            mastery. Your next
+            attempt can adjust
+            after this result.
+          </p>
+        </div>
+
+        <strong>
+          {
+            topicMasteryService.getAverageMastery(
+              activeQuiz.courseId,
+            )
+          }
+          % mastery
+        </strong>
+      </article>
+
+      {score !==
+        null && (
         <div className="quiz-result-card">
           <div className="quiz-result-icon">
             <Trophy
@@ -368,18 +495,18 @@ function Quiz() {
             </span>
 
             <h2>
-              {percentage}% score
+              {percentage}%
+              score
             </h2>
 
             <p>
               You answered{' '}
               {score} out of{' '}
               {
-                activeQuiz
-                  .questions
-                  .length
+                activeQuestions.length
               }{' '}
-              questions correctly.
+              questions
+              correctly.
             </p>
           </div>
 
@@ -392,264 +519,280 @@ function Quiz() {
             <RotateCcw
               size={16}
             />
+
             Retake quiz
           </button>
         </div>
       )}
 
-      <div className="quiz-questions">
-        {activeQuiz.questions.map(
-          (
-            question,
-            questionIndex,
-          ) => {
-            const answer =
-              answers[
-                question.id
-              ];
-
-            const questionCorrect =
-              score !== null &&
-              isQuestionCorrect(
-                question,
-                answer,
-              );
-
-            return (
-              <article
-                className="quiz-question-card"
-                key={
+      {activeQuestions.length >
+      0 ? (
+        <div className="quiz-questions">
+          {activeQuestions.map(
+            (
+              question,
+              questionIndex,
+            ) => {
+              const answer =
+                answers[
                   question.id
-                }
-              >
-                <div className="quiz-question-number">
-                  {questionIndex +
-                    1}
-                </div>
+                ];
 
-                <div className="quiz-question-content">
-                  <div className="quiz-question-heading">
-                    <h2>
-                      {
-                        question.question
-                      }
-                    </h2>
+              const questionCorrect =
+                score !==
+                  null &&
+                isQuestionCorrect(
+                  question,
+                  answer,
+                );
 
-                    <span className="quiz-question-type">
-                      {question.type ===
-                      'single'
-                        ? 'Single choice'
-                        : question.type ===
-                            'multiple'
-                          ? 'Select all that apply'
-                          : 'Short answer'}
-                    </span>
+              return (
+                <article
+                  className="quiz-question-card"
+                  key={
+                    question.id
+                  }
+                >
+                  <div className="quiz-question-number">
+                    {questionIndex +
+                      1}
                   </div>
 
-                  {question.type ===
-                    'short' ? (
-                    <div className="quiz-short-answer">
-                      <input
-                        type="text"
-                        value={
-                          typeof answer ===
-                          'string'
-                            ? answer
-                            : ''
+                  <div className="quiz-question-content">
+                    <div className="quiz-question-heading">
+                      <h2>
+                        {
+                          question.question
                         }
-                        onChange={(
-                          event,
-                        ) =>
-                          updateShortAnswer(
-                            question.id,
-                            event
-                              .target
-                              .value,
-                          )
-                        }
-                        disabled={
-                          score !==
-                          null
-                        }
-                        placeholder="Type your answer..."
-                      />
+                      </h2>
 
-                      {score !==
-                        null && (
-                        <div
-                          className={`quiz-answer-feedback ${
-                            questionCorrect
-                              ? 'correct'
-                              : 'wrong'
-                          }`}
-                        >
-                          {questionCorrect ? (
-                            <CheckCircle2
-                              size={
-                                15
-                              }
-                            />
-                          ) : (
-                            <XCircle
-                              size={
-                                15
-                              }
-                            />
-                          )}
-
-                          <span>
-                            {questionCorrect
-                              ? 'Correct answer'
-                              : `Accepted answer: ${
-                                  question
-                                    .acceptedAnswers?.[0] ??
-                                  ''
-                                }`}
-                          </span>
-                        </div>
-                      )}
+                      <span className="quiz-question-type">
+                        {question.type ===
+                        'single'
+                          ? 'Single choice'
+                          : question.type ===
+                              'multiple'
+                            ? 'Select all that apply'
+                            : 'Short answer'}
+                      </span>
                     </div>
-                  ) : (
-                    <div className="quiz-options">
-                      {question.options?.map(
-                        (
-                          option,
-                          optionIndex,
-                        ) => {
-                          const selected =
-                            question.type ===
-                            'multiple'
-                              ? Array.isArray(
-                                  answer,
-                                ) &&
-                                answer.includes(
-                                  optionIndex,
-                                )
-                              : answer ===
-                                optionIndex;
 
-                          const correct =
+                    {question.type ===
+                    'short' ? (
+                      <div className="quiz-short-answer">
+                        <input
+                          type="text"
+                          value={
+                            typeof answer ===
+                            'string'
+                              ? answer
+                              : ''
+                          }
+                          onChange={(
+                            event,
+                          ) =>
+                            updateShortAnswer(
+                              question.id,
+                              event
+                                .target
+                                .value,
+                            )
+                          }
+                          disabled={
                             score !==
-                              null &&
-                            (question.type ===
-                            'multiple'
-                              ? question.correctAnswers?.includes(
-                                  optionIndex,
-                                )
-                              : question.correctAnswer ===
-                                optionIndex);
+                            null
+                          }
+                          placeholder="Type your answer..."
+                        />
 
-                          const wrong =
-                            score !==
-                              null &&
-                            selected &&
-                            !correct;
+                        {score !==
+                          null && (
+                          <div
+                            className={`quiz-answer-feedback ${
+                              questionCorrect
+                                ? 'correct'
+                                : 'wrong'
+                            }`}
+                          >
+                            {questionCorrect ? (
+                              <CheckCircle2
+                                size={
+                                  15
+                                }
+                              />
+                            ) : (
+                              <XCircle
+                                size={
+                                  15
+                                }
+                              />
+                            )}
 
-                          return (
-                            <button
-                              type="button"
-                              key={
-                                option
-                              }
-                              className={[
-                                'quiz-option',
-                                selected
-                                  ? 'selected'
-                                  : '',
-                                correct
-                                  ? 'correct'
-                                  : '',
-                                wrong
-                                  ? 'wrong'
-                                  : '',
-                              ]
-                                .filter(
-                                  Boolean,
-                                )
-                                .join(
-                                  ' ',
-                                )}
-                              onClick={() =>
-                                question.type ===
-                                'multiple'
-                                  ? toggleMultiple(
-                                      question.id,
-                                      optionIndex,
-                                    )
-                                  : selectSingle(
-                                      question.id,
-                                      optionIndex,
-                                    )
-                              }
-                            >
-                              <span>
-                                {question.type ===
-                                'multiple'
-                                  ? selected
-                                    ? '✓'
-                                    : '□'
-                                  : String.fromCharCode(
-                                      65 +
-                                        optionIndex,
-                                    )}
-                              </span>
+                            <span>
+                              {questionCorrect
+                                ? 'Correct answer'
+                                : `Accepted answer: ${
+                                    question
+                                      .acceptedAnswers?.[0] ??
+                                    ''
+                                  }`}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="quiz-options">
+                        {question.options?.map(
+                          (
+                            option,
+                            optionIndex,
+                          ) => {
+                            const selected =
+                              question.type ===
+                              'multiple'
+                                ? Array.isArray(
+                                    answer,
+                                  ) &&
+                                  answer.includes(
+                                    optionIndex,
+                                  )
+                                : answer ===
+                                  optionIndex;
 
-                              <strong>
-                                {
+                            const correct =
+                              score !==
+                                null &&
+                              (question.type ===
+                              'multiple'
+                                ? question.correctAnswers?.includes(
+                                    optionIndex,
+                                  )
+                                : question.correctAnswer ===
+                                  optionIndex);
+
+                            const wrong =
+                              score !==
+                                null &&
+                              selected &&
+                              !correct;
+
+                            return (
+                              <button
+                                type="button"
+                                key={
                                   option
                                 }
-                              </strong>
+                                className={[
+                                  'quiz-option',
+                                  selected
+                                    ? 'selected'
+                                    : '',
+                                  correct
+                                    ? 'correct'
+                                    : '',
+                                  wrong
+                                    ? 'wrong'
+                                    : '',
+                                ]
+                                  .filter(
+                                    Boolean,
+                                  )
+                                  .join(
+                                    ' ',
+                                  )}
+                                onClick={() =>
+                                  question.type ===
+                                  'multiple'
+                                    ? toggleMultiple(
+                                        question.id,
+                                        optionIndex,
+                                      )
+                                    : selectSingle(
+                                        question.id,
+                                        optionIndex,
+                                      )
+                                }
+                              >
+                                <span>
+                                  {question.type ===
+                                  'multiple'
+                                    ? selected
+                                      ? '✓'
+                                      : '□'
+                                    : String.fromCharCode(
+                                        65 +
+                                          optionIndex,
+                                      )}
+                                </span>
 
-                              {correct && (
-                                <CheckCircle2
-                                  size={
-                                    17
+                                <strong>
+                                  {
+                                    option
                                   }
-                                />
-                              )}
-                            </button>
-                          );
-                        },
-                      )}
-                    </div>
-                  )}
-                </div>
-              </article>
-            );
-          },
-        )}
-      </div>
+                                </strong>
 
-      {score === null && (
-        <div className="quiz-submit-row">
-          <span>
-            {answeredCount ===
-            activeQuiz.questions
-              .length
-              ? 'All questions answered.'
-              : `${
-                  activeQuiz
-                    .questions
-                    .length -
-                  answeredCount
-                } questions remaining.`}
-          </span>
-
-          <button
-            type="button"
-            disabled={
-              answeredCount !==
-              activeQuiz.questions
-                .length
-            }
-            onClick={
-              handleSubmit
-            }
-          >
-            Submit quiz
-          </button>
+                                {correct && (
+                                  <CheckCircle2
+                                    size={
+                                      17
+                                    }
+                                  />
+                                )}
+                              </button>
+                            );
+                          },
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </article>
+              );
+            },
+          )}
         </div>
+      ) : (
+        <section className="learning-empty-state">
+          <h2>
+            No adaptive
+            questions available
+          </h2>
+
+          <p>
+            Questions for this
+            mastery level have
+            not been configured.
+          </p>
+        </section>
       )}
+
+      {score === null &&
+        activeQuestions.length >
+          0 && (
+          <div className="quiz-submit-row">
+            <span>
+              {answeredCount ===
+              activeQuestions.length
+                ? 'All questions answered.'
+                : `${
+                    activeQuestions.length -
+                    answeredCount
+                  } questions remaining.`}
+            </span>
+
+            <button
+              type="button"
+              disabled={
+                answeredCount !==
+                activeQuestions.length
+              }
+              onClick={
+                handleSubmit
+              }
+            >
+              Submit quiz
+            </button>
+          </div>
+        )}
     </section>
   );
 }

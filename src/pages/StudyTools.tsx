@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   ChevronDown,
   CircleAlert,
+  Gauge,
   Lightbulb,
   RotateCcw,
   Sparkles,
@@ -15,40 +16,60 @@ import { quizzes } from '../data/assessmentData';
 import { studyResources } from '../data/studyToolsData';
 import { assessmentService } from '../services/assessmentService';
 import { studyToolsService } from '../services/studyToolsService';
+import { topicMasteryService } from '../services/topicMasteryService';
 
 function StudyTools() {
-  const [courseId, setCourseId] = useState(
-    studyResources[0]?.courseId ?? '',
-  );
+  const [courseId, setCourseId] =
+    useState(
+      studyResources[0]?.courseId ??
+        '',
+    );
 
-  const [flippedCardId, setFlippedCardId] =
-    useState<string | null>(null);
+  const [
+    flippedCardId,
+    setFlippedCardId,
+  ] =
+    useState<string | null>(
+      null,
+    );
 
-  const [, setVersion] = useState(0);
+  const [, setVersion] =
+    useState(0);
 
-  const resource = studyResources.find(
-    (item) => item.courseId === courseId,
-  );
+  const resource =
+    studyResources.find(
+      (item) =>
+        item.courseId ===
+        courseId,
+    );
 
   if (!resource) {
     return (
       <section className="learning-empty-state">
-        <BrainCircuit size={38} />
+        <BrainCircuit
+          size={38}
+        />
 
-        <h1>Study tools unavailable</h1>
+        <h1>
+          Study tools unavailable
+        </h1>
 
         <p>
-          No study resources are available for this course yet.
+          No study resources are
+          available for this course
+          yet.
         </p>
       </section>
     );
   }
 
-  const activeResource = resource;
+  const activeResource =
+    resource;
 
   const cardIds =
     activeResource.flashcards.map(
-      (card) => card.id,
+      (card) =>
+        card.id,
     );
 
   const masteredCount =
@@ -65,17 +86,19 @@ function StudyTools() {
         )
       : 0;
 
-  const courseQuiz = quizzes.find(
-    (quiz) =>
-      quiz.courseId ===
-      activeResource.courseId,
-  );
+  const courseQuiz =
+    quizzes.find(
+      (quiz) =>
+        quiz.courseId ===
+        activeResource.courseId,
+    );
 
-  const quizAttempt = courseQuiz
-    ? assessmentService.getQuizAttempt(
-        courseQuiz.id,
-      )
-    : null;
+  const quizAttempt =
+    courseQuiz
+      ? assessmentService.getQuizAttempt(
+          courseQuiz.id,
+        )
+      : null;
 
   const quizPercentage =
     quizAttempt
@@ -86,28 +109,51 @@ function StudyTools() {
         )
       : null;
 
+  const topicMastery =
+    topicMasteryService.getCourseMastery(
+      activeResource.courseId,
+    );
+
+  const averageTopicMastery =
+    topicMasteryService.getAverageMastery(
+      activeResource.courseId,
+    );
+
+  const recommendedDifficulty =
+    topicMasteryService.getRecommendedDifficulty(
+      activeResource.courseId,
+    );
+
   const reviewTopic =
     activeResource.topics.find(
       (topic) =>
-        topic.status === 'review',
+        topic.status ===
+        'review',
     );
 
   const nextTopic =
     activeResource.topics.find(
       (topic) =>
-        topic.status === 'next',
+        topic.status ===
+        'next',
     );
 
   function getPersonalizedPlan() {
-    if (quizPercentage === null) {
+    if (
+      quizPercentage === null
+    ) {
       return {
-        status: 'Assessment needed',
+        status:
+          'Assessment needed',
         headline:
           'Complete a quiz to personalize your plan',
         description:
           'Your recommendations will adapt once a quiz score is available.',
         steps: [
-          `Review ${reviewTopic?.title ?? 'the current course topics'} before your assessment.`,
+          `Review ${
+            reviewTopic?.title ??
+            'the current course topics'
+          } before your assessment.`,
           'Practice the available flashcards and mark confident answers as mastered.',
           'Complete the course quiz so VertexLearn can identify your current learning level.',
           'Return here after the quiz to see a score-based study recommendation.',
@@ -115,14 +161,20 @@ function StudyTools() {
       };
     }
 
-    if (quizPercentage < 60) {
+    if (
+      quizPercentage < 60
+    ) {
       return {
-        status: 'Needs focused review',
+        status:
+          'Needs focused review',
         headline:
           'Strengthen the fundamentals first',
         description: `Your latest quiz score is ${quizPercentage}%. Focus on weaker concepts before moving ahead.`,
         steps: [
-          `Review ${reviewTopic?.title ?? 'the topic marked Needs review'} carefully.`,
+          `Review ${
+            reviewTopic?.title ??
+            'the topic marked Needs review'
+          } carefully.`,
           'Practice every flashcard at least once before marking cards as mastered.',
           'Use AI Tutor in Beginner mode for concepts that are still unclear.',
           'Retake the quiz after revision and aim for at least 60%.',
@@ -130,28 +182,41 @@ function StudyTools() {
       };
     }
 
-    if (quizPercentage < 80) {
+    if (
+      quizPercentage < 80
+    ) {
       return {
-        status: 'Good progress',
+        status:
+          'Good progress',
         headline:
           'Target the remaining weak areas',
         description: `Your latest quiz score is ${quizPercentage}%. Your fundamentals are developing, but a focused review can improve mastery.`,
         steps: [
-          `Spend extra time on ${reviewTopic?.title ?? 'the recommended review topic'}.`,
+          `Spend extra time on ${
+            reviewTopic?.title ??
+            'the recommended review topic'
+          }.`,
           'Practice the flashcards that you have not mastered yet.',
           'Use AI Tutor in Intermediate mode for practical explanations.',
-          `Continue with ${nextTopic?.title ?? 'the next recommended topic'} after review.`,
+          `Continue with ${
+            nextTopic?.title ??
+            'the next recommended topic'
+          } after review.`,
         ],
       };
     }
 
     return {
-      status: 'Strong performance',
+      status:
+        'Strong performance',
       headline:
         'You are ready to progress',
       description: `Your latest quiz score is ${quizPercentage}%. Continue building on your strong assessment performance.`,
       steps: [
-        `Continue with ${nextTopic?.title ?? 'the next recommended topic'}.`,
+        `Continue with ${
+          nextTopic?.title ??
+          'the next recommended topic'
+        }.`,
         'Master any remaining flashcards to reinforce long-term recall.',
         'Use AI Tutor in Advanced mode to explore deeper concepts and edge cases.',
         'Attempt another assessment after completing the next learning topic.',
@@ -166,7 +231,10 @@ function StudyTools() {
     value: string,
   ) {
     setCourseId(value);
-    setFlippedCardId(null);
+
+    setFlippedCardId(
+      null,
+    );
   }
 
   function handleMastered(
@@ -177,7 +245,19 @@ function StudyTools() {
     );
 
     setVersion(
-      (value) => value + 1,
+      (value) =>
+        value + 1,
+    );
+  }
+
+  function formatDifficulty() {
+    return (
+      recommendedDifficulty
+        .charAt(0)
+        .toUpperCase() +
+      recommendedDifficulty.slice(
+        1,
+      )
     );
   }
 
@@ -189,32 +269,48 @@ function StudyTools() {
             AI study toolkit
           </span>
 
-          <h1>Study Tools</h1>
+          <h1>
+            Study Tools
+          </h1>
 
           <p>
-            Review course summaries,
-            practice with flashcards and
-            follow recommendations based
-            on your quiz performance.
+            Review course
+            summaries, practice
+            with flashcards and
+            follow recommendations
+            based on your quiz
+            performance and topic
+            mastery.
           </p>
         </div>
 
         <div className="study-course-select">
-          <BookOpen size={16} />
+          <BookOpen
+            size={16}
+          />
 
           <select
-            value={courseId}
-            onChange={(event) =>
+            value={
+              courseId
+            }
+            onChange={(
+              event,
+            ) =>
               handleCourseChange(
-                event.target.value,
+                event.target
+                  .value,
               )
             }
           >
             {studyResources.map(
               (item) => (
                 <option
-                  key={item.courseId}
-                  value={item.courseId}
+                  key={
+                    item.courseId
+                  }
+                  value={
+                    item.courseId
+                  }
                 >
                   {
                     item.courseTitle
@@ -224,7 +320,9 @@ function StudyTools() {
             )}
           </select>
 
-          <ChevronDown size={15} />
+          <ChevronDown
+            size={15}
+          />
         </div>
       </div>
 
@@ -256,7 +354,9 @@ function StudyTools() {
                 point,
                 index,
               ) => (
-                <div key={point}>
+                <div
+                  key={point}
+                >
                   <span>
                     {index + 1}
                   </span>
@@ -290,18 +390,22 @@ function StudyTools() {
             </span>
 
             <h2>
-              {masteredCount} of{' '}
+              {masteredCount}{' '}
+              of{' '}
               {
                 activeResource
-                  .flashcards.length
+                  .flashcards
+                  .length
               }{' '}
               mastered
             </h2>
 
             <p>
-              Mark cards as mastered once
-              you are confident you can
-              recall the answer without
+              Mark cards as
+              mastered once you
+              are confident you
+              can recall the
+              answer without
               help.
             </p>
 
@@ -318,7 +422,9 @@ function StudyTools() {
 
       <article className="study-quiz-insight">
         <div className="study-quiz-insight-icon">
-          <Trophy size={21} />
+          <Trophy
+            size={21}
+          />
         </div>
 
         <div className="study-quiz-insight-content">
@@ -327,7 +433,8 @@ function StudyTools() {
           </span>
 
           <h2>
-            {quizPercentage !== null
+            {quizPercentage !==
+            null
               ? `${quizPercentage}% latest score`
               : 'No quiz attempt yet'}
           </h2>
@@ -346,6 +453,48 @@ function StudyTools() {
         </div>
       </article>
 
+      <article className="topic-mastery-overview">
+        <div className="topic-mastery-overview-icon">
+          <Gauge
+            size={22}
+          />
+        </div>
+
+        <div className="topic-mastery-overview-content">
+          <span>
+            Adaptive learning
+          </span>
+
+          <h2>
+            {averageTopicMastery}%
+            average topic mastery
+          </h2>
+
+          <p>
+            Your topic-level
+            mastery is calculated
+            from course progress
+            signals and your latest
+            quiz performance.
+          </p>
+        </div>
+
+        <div className="adaptive-difficulty-card">
+          <span>
+            Recommended AI level
+          </span>
+
+          <strong>
+            {formatDifficulty()}
+          </strong>
+
+          <small>
+            Adjusted from current
+            mastery
+          </small>
+        </div>
+      </article>
+
       <section className="flashcard-section">
         <div className="section-heading">
           <div>
@@ -354,15 +503,16 @@ function StudyTools() {
             </h2>
 
             <p>
-              Click a card to reveal the
-              answer.
+              Click a card to
+              reveal the answer.
             </p>
           </div>
 
           <span className="flashcard-count">
             {
               activeResource
-                .flashcards.length
+                .flashcards
+                .length
             }{' '}
             cards
           </span>
@@ -394,7 +544,9 @@ function StudyTools() {
                       ? 'mastered'
                       : ''
                   }`}
-                  key={card.id}
+                  key={
+                    card.id
+                  }
                 >
                   <button
                     type="button"
@@ -421,6 +573,7 @@ function StudyTools() {
                               13
                             }
                           />
+
                           Mastered
                         </span>
                       )}
@@ -490,67 +643,100 @@ function StudyTools() {
 
             <div>
               <span>
-                Personalized focus
+                Personalized
+                focus
               </span>
 
               <h2>
-                Topic recommendations
+                Topic mastery
               </h2>
             </div>
           </div>
 
           <div className="topic-list">
             {activeResource.topics.map(
-              (topic) => (
-                <article
-                  className={`topic-card ${topic.status}`}
-                  key={
-                    topic.title
-                  }
-                >
-                  <div className="topic-status-icon">
-                    {topic.status ===
-                    'strong' ? (
-                      <CheckCircle2
-                        size={17}
-                      />
-                    ) : topic.status ===
-                      'review' ? (
-                      <CircleAlert
-                        size={17}
-                      />
-                    ) : (
-                      <Lightbulb
-                        size={17}
-                      />
-                    )}
-                  </div>
+              (topic) => {
+                const mastery =
+                  topicMastery.find(
+                    (item) =>
+                      item.topicTitle ===
+                      topic.title,
+                  );
 
-                  <div>
-                    <span>
+                const score =
+                  mastery?.score ??
+                  0;
+
+                return (
+                  <article
+                    className={`topic-card ${topic.status}`}
+                    key={
+                      topic.title
+                    }
+                  >
+                    <div className="topic-status-icon">
                       {topic.status ===
-                      'strong'
-                        ? 'Strong topic'
-                        : topic.status ===
-                            'review'
-                          ? 'Needs review'
-                          : 'Study next'}
-                    </span>
+                      'strong' ? (
+                        <CheckCircle2
+                          size={17}
+                        />
+                      ) : topic.status ===
+                        'review' ? (
+                        <CircleAlert
+                          size={17}
+                        />
+                      ) : (
+                        <Lightbulb
+                          size={17}
+                        />
+                      )}
+                    </div>
 
-                    <h3>
-                      {
-                        topic.title
-                      }
-                    </h3>
+                    <div className="topic-card-content">
+                      <div className="topic-card-heading">
+                        <div>
+                          <span>
+                            {mastery?.level ===
+                            'strong'
+                              ? 'Strong mastery'
+                              : mastery?.level ===
+                                  'proficient'
+                                ? 'Proficient'
+                                : 'Developing'}
+                          </span>
 
-                    <p>
-                      {
-                        topic.note
-                      }
-                    </p>
-                  </div>
-                </article>
-              ),
+                          <h3>
+                            {
+                              topic.title
+                            }
+                          </h3>
+                        </div>
+
+                        <strong className="topic-mastery-score">
+                          {score}%
+                        </strong>
+                      </div>
+
+                      <p>
+                        {
+                          topic.note
+                        }
+                      </p>
+
+                      <div
+                        className="topic-mastery-track"
+                        aria-label={`${topic.title} mastery ${score}%`}
+                      >
+                        <div
+                          style={{
+                            width: `${score}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </article>
+                );
+              },
             )}
           </div>
         </section>
@@ -563,7 +749,8 @@ function StudyTools() {
           </div>
 
           <span>
-            Personalized study plan
+            Personalized study
+            plan
           </span>
 
           <h2>
@@ -578,10 +765,13 @@ function StudyTools() {
                 step,
                 index,
               ) => (
-                <div key={step}>
+                <div
+                  key={step}
+                >
                   <strong>
                     {String(
-                      index + 1,
+                      index +
+                        1,
                     ).padStart(
                       2,
                       '0',
@@ -601,7 +791,8 @@ function StudyTools() {
               size={15}
             />
 
-            {quizPercentage !== null
+            {quizPercentage !==
+            null
               ? `Generated from your latest ${quizPercentage}% quiz score`
               : 'Complete a quiz to unlock score-based recommendations'}
           </div>
