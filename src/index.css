@@ -10090,3 +10090,604 @@ html[data-theme='dark']
     width: 100%;
   }
 }
+
+/* ==============================
+   Instructor Analytics
+   ============================== */
+
+.instructor-analytics-section {
+  display: grid;
+  gap: 20px;
+}
+
+.analytics-course-selector {
+  display: grid;
+  gap: 5px;
+  min-width: 210px;
+}
+
+.analytics-course-selector > span {
+  color: #7f8496;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.analytics-course-selector select {
+  min-height: 38px;
+  padding: 0 11px;
+  color: #353b4e;
+  border: 1px solid #dedfe6;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  font: inherit;
+  font-size: 8px;
+}
+
+.analytics-course-selector select:focus {
+  border-color: #7569dc;
+  box-shadow:
+    0 0 0 3px
+    rgba(101, 88, 216, 0.1);
+}
+
+/* Metric cards */
+
+.analytics-metric-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.analytics-metric-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #e1e3ea;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.analytics-metric-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 39px;
+  height: 39px;
+  border-radius: 9px;
+}
+
+.analytics-metric-icon.purple {
+  color: #6558d8;
+  background: #f1efff;
+}
+
+.analytics-metric-icon.blue {
+  color: #4277c8;
+  background: #edf5ff;
+}
+
+.analytics-metric-icon.green {
+  color: #378461;
+  background: #edf8f2;
+}
+
+.analytics-metric-icon.orange {
+  color: #b87731;
+  background: #fff3e6;
+}
+
+.analytics-metric-card > div:last-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.analytics-metric-card span {
+  color: #898e9f;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.analytics-metric-card strong {
+  color: #252b3e;
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.analytics-metric-card small {
+  color: #a0a4b2;
+  font-size: 6px;
+}
+
+/* Main analytics area */
+
+.analytics-content-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.65fr)
+    minmax(220px, 0.65fr);
+  gap: 16px;
+}
+
+.analytics-dropoff-panel,
+.analytics-insight-panel,
+.analytics-summary-panel {
+  border: 1px solid #e1e3ea;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.analytics-dropoff-panel {
+  padding: 18px;
+}
+
+.analytics-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 17px;
+}
+
+.analytics-panel-heading > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.analytics-panel-heading > div:first-child > span {
+  color: #6558d8;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.analytics-panel-heading h3 {
+  margin: 0;
+  color: #282e42;
+  font-size: 13px;
+}
+
+.analytics-panel-heading p {
+  margin: 1px 0 0;
+  color: #8d92a2;
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+.analytics-learner-count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  color: #6558d8;
+  border: 1px solid #e5e1ff;
+  border-radius: 9px;
+  background: #f7f5ff;
+}
+
+.analytics-learner-count strong {
+  font-size: 9px;
+}
+
+.analytics-learner-count span {
+  color: #8d92a3;
+  font-size: 7px;
+}
+
+/* Lecture rows */
+
+.lecture-dropoff-list {
+  display: grid;
+  gap: 9px;
+}
+
+.lecture-dropoff-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px;
+  border: 1px solid #ececf1;
+  border-radius: 10px;
+  background: #fcfcfe;
+}
+
+.lecture-dropoff-number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  color: #6558d8;
+  border-radius: 8px;
+  background: #efedff;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.lecture-dropoff-main {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 8px;
+}
+
+.lecture-dropoff-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lecture-dropoff-title > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lecture-dropoff-title h4 {
+  margin: 0;
+  color: #343a4d;
+  font-size: 9px;
+}
+
+.lecture-dropoff-title span {
+  color: #959aaa;
+  font-size: 6px;
+}
+
+.lecture-dropoff-title > strong {
+  flex: 0 0 auto;
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-size: 7px;
+  white-space: nowrap;
+}
+
+.lecture-dropoff-title > strong.low {
+  color: #287c53;
+  background: #edf8f2;
+}
+
+.lecture-dropoff-title > strong.medium {
+  color: #a26b25;
+  background: #fff3e4;
+}
+
+.lecture-dropoff-title > strong.high {
+  color: #b24e4e;
+  background: #fff0f0;
+}
+
+.lecture-dropoff-track {
+  overflow: hidden;
+  height: 6px;
+  border-radius: 999px;
+  background: #ececf2;
+}
+
+.lecture-dropoff-track > div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #6558d8,
+    #8b7ff0
+  );
+}
+
+.lecture-dropoff-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #858a9b;
+  font-size: 7px;
+}
+
+.lecture-dropoff-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Insight panel */
+
+.analytics-insight-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+}
+
+.analytics-insight-icon {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  margin-bottom: 14px;
+  color: #b55c51;
+  border-radius: 10px;
+  background: #fff0ee;
+}
+
+.analytics-insight-panel > span {
+  color: #b45c51;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.analytics-insight-panel > h3 {
+  margin: 4px 0 12px;
+  color: #292f42;
+  font-size: 13px;
+}
+
+.analytics-insight-value {
+  color: #b44f4f;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.analytics-insight-panel h4 {
+  margin: 10px 0 5px;
+  color: #3b4154;
+  font-size: 10px;
+}
+
+.analytics-insight-panel p {
+  margin: 0;
+  color: #858a9b;
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+.analytics-insight-watch {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: auto;
+  padding-top: 20px;
+  color: #7d8293;
+  font-size: 7px;
+}
+
+.analytics-insight-watch strong {
+  color: #4a5063;
+}
+
+/* Analytics summary */
+
+.analytics-summary-panel {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 16px 18px;
+}
+
+.analytics-summary-panel > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.analytics-summary-panel > div > svg {
+  box-sizing: content-box;
+  padding: 10px;
+  color: #6558d8;
+  border-radius: 9px;
+  background: #f1efff;
+}
+
+.analytics-summary-panel > div > div {
+  display: grid;
+  gap: 2px;
+}
+
+.analytics-summary-panel span {
+  color: #8b90a1;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.analytics-summary-panel h3 {
+  margin: 0;
+  color: #30364a;
+  font-size: 10px;
+}
+
+.analytics-summary-panel p {
+  margin: 0;
+  color: #7e8495;
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+.analytics-summary-panel p strong {
+  color: #4c5265;
+}
+
+/* Empty state */
+
+.analytics-empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 45px 20px;
+  color: #989dab;
+  border: 1px dashed #dfe1e7;
+  border-radius: 14px;
+  background: #fafafe;
+  text-align: center;
+}
+
+.analytics-empty-state h3 {
+  margin: 3px 0 0;
+  color: #4b5164;
+  font-size: 11px;
+}
+
+.analytics-empty-state p {
+  margin: 0;
+  font-size: 8px;
+}
+
+/* Dark mode */
+
+html[data-theme='dark']
+  .analytics-course-selector select,
+html[data-theme='dark']
+  .analytics-metric-card,
+html[data-theme='dark']
+  .analytics-dropoff-panel,
+html[data-theme='dark']
+  .analytics-insight-panel,
+html[data-theme='dark']
+  .analytics-summary-panel {
+  color: #e4e6ee;
+  border-color: #303546;
+  background: #191e2d;
+}
+
+html[data-theme='dark']
+  .analytics-course-selector select {
+  background: #161b29;
+}
+
+html[data-theme='dark']
+  .analytics-metric-card strong,
+html[data-theme='dark']
+  .analytics-panel-heading h3,
+html[data-theme='dark']
+  .analytics-insight-panel > h3,
+html[data-theme='dark']
+  .analytics-insight-panel h4,
+html[data-theme='dark']
+  .analytics-summary-panel h3 {
+  color: #e4e6ee;
+}
+
+html[data-theme='dark']
+  .lecture-dropoff-row {
+  border-color: #303546;
+  background: #161b29;
+}
+
+html[data-theme='dark']
+  .lecture-dropoff-title h4 {
+  color: #dfe2ea;
+}
+
+html[data-theme='dark']
+  .lecture-dropoff-track {
+  background: #2d3242;
+}
+
+html[data-theme='dark']
+  .analytics-learner-count {
+  color: #aaa1ff;
+  border-color: #454061;
+  background: #27233f;
+}
+
+html[data-theme='dark']
+  .lecture-dropoff-number,
+html[data-theme='dark']
+  .analytics-summary-panel
+  > div
+  > svg {
+  color: #aaa1ff;
+  background: #27233f;
+}
+
+html[data-theme='dark']
+  .analytics-insight-icon {
+  color: #e58d83;
+  background: #392524;
+}
+
+html[data-theme='dark']
+  .analytics-insight-panel p,
+html[data-theme='dark']
+  .analytics-summary-panel p,
+html[data-theme='dark']
+  .analytics-panel-heading p {
+  color: #aeb3c2;
+}
+
+html[data-theme='dark']
+  .analytics-summary-panel p strong,
+html[data-theme='dark']
+  .analytics-insight-watch strong {
+  color: #d9dce5;
+}
+
+html[data-theme='dark']
+  .analytics-empty-state {
+  border-color: #353a4a;
+  background: #161b29;
+}
+
+html[data-theme='dark']
+  .analytics-empty-state h3 {
+  color: #e2e4ec;
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+  .analytics-metric-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .analytics-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-course-selector {
+    width: 100%;
+  }
+
+  .analytics-insight-watch {
+    margin-top: 18px;
+  }
+}
+
+@media (max-width: 620px) {
+  .analytics-metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-panel-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .analytics-learner-count {
+    width: fit-content;
+  }
+
+  .lecture-dropoff-title {
+    flex-direction: column;
+  }
+
+  .lecture-dropoff-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .analytics-summary-panel {
+    grid-template-columns: 1fr;
+  }
+}
