@@ -12,24 +12,27 @@ import {
 import { useState } from 'react';
 import {
   badges,
-  certificates,
   type Certificate,
 } from '../data/engagementData';
 import { authService } from '../services/authService';
 import { engagementService } from '../services/engagementService';
 
 function Certificates() {
-  const [, setVersion] = useState(0);
+  const [, setVersion] =
+    useState(0);
+
+  const resolvedCertificates =
+    engagementService.getCertificates();
 
   const earnedCertificates =
-    certificates.filter(
+    resolvedCertificates.filter(
       (certificate) =>
         certificate.status ===
         'earned',
     );
 
   const inProgressCertificates =
-    certificates.filter(
+    resolvedCertificates.filter(
       (certificate) =>
         certificate.status ===
         'in-progress',
@@ -475,9 +478,10 @@ function Certificates() {
             </h2>
 
             <p>
-              Credentials earned
-              by completing
-              learning paths.
+              Certificates unlock
+              automatically when
+              course completion
+              reaches 100%.
             </p>
           </div>
         </div>
@@ -531,13 +535,12 @@ function Certificates() {
                     </h3>
 
                     <p>
-                      Awarded for
-                      successfully
-                      completing all
-                      required
-                      learning
-                      activities and
-                      assessments.
+                      Awarded after
+                      reaching 100%
+                      completion for
+                      the available
+                      course learning
+                      content.
                     </p>
                   </div>
 
@@ -618,12 +621,10 @@ function Certificates() {
               </h2>
 
               <p>
-                Complete the
-                remaining
-                learning
-                activities to
-                unlock your
-                certificate.
+                Complete all
+                available course
+                lessons to unlock
+                the certificate.
               </p>
             </div>
           </div>
@@ -657,7 +658,10 @@ function Certificates() {
                       }
                     </h3>
 
-                    <div className="certificate-progress-track">
+                    <div
+                      className="certificate-progress-track"
+                      aria-label={`${certificate.courseTitle} completion ${certificate.progress}%`}
+                    >
                       <div
                         style={{
                           width: `${certificate.progress}%`,
