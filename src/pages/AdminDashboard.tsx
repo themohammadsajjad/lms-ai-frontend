@@ -14,6 +14,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import AdminAnalytics from '../components/admin/AdminAnalytics';
 import {
   platformActivity,
   type AdminUserRole,
@@ -22,6 +23,7 @@ import { adminService } from '../services/adminService';
 
 type AdminTab =
   | 'overview'
+  | 'analytics'
   | 'approvals'
   | 'users';
 
@@ -29,15 +31,13 @@ function AdminDashboard() {
   const [activeTab, setActiveTab] =
     useState<AdminTab>('overview');
 
-  const [users, setUsers] =
-    useState(() =>
-      adminService.getUsers(),
-    );
+  const [users, setUsers] = useState(() =>
+    adminService.getUsers(),
+  );
 
-  const [approvals, setApprovals] =
-    useState(() =>
-      adminService.getCourseApprovals(),
-    );
+  const [approvals, setApprovals] = useState(() =>
+    adminService.getCourseApprovals(),
+  );
 
   const [userSearch, setUserSearch] =
     useState('');
@@ -55,52 +55,45 @@ function AdminDashboard() {
       user.role === 'instructor',
   ).length;
 
-  const pendingApprovals =
-    approvals.filter(
-      (course) =>
-        course.status === 'pending',
-    ).length;
+  const pendingApprovals = approvals.filter(
+    (course) =>
+      course.status === 'pending',
+  ).length;
 
-  const approvedCourses =
-    approvals.filter(
-      (course) =>
-        course.status === 'approved',
-    ).length;
+  const approvedCourses = approvals.filter(
+    (course) =>
+      course.status === 'approved',
+  ).length;
 
-  const filteredUsers =
-    useMemo(() => {
-      const query =
-        userSearch
-          .trim()
-          .toLowerCase();
+  const filteredUsers = useMemo(() => {
+    const query = userSearch
+      .trim()
+      .toLowerCase();
 
-      return users.filter(
-        (user) => {
-          const matchesSearch =
-            !query ||
-            user.name
-              .toLowerCase()
-              .includes(query) ||
-            user.email
-              .toLowerCase()
-              .includes(query);
+    return users.filter((user) => {
+      const matchesSearch =
+        !query ||
+        user.name
+          .toLowerCase()
+          .includes(query) ||
+        user.email
+          .toLowerCase()
+          .includes(query);
 
-          const matchesRole =
-            roleFilter === 'all' ||
-            user.role ===
-              roleFilter;
+      const matchesRole =
+        roleFilter === 'all' ||
+        user.role === roleFilter;
 
-          return (
-            matchesSearch &&
-            matchesRole
-          );
-        },
+      return (
+        matchesSearch &&
+        matchesRole
       );
-    }, [
-      users,
-      userSearch,
-      roleFilter,
-    ]);
+    });
+  }, [
+    users,
+    userSearch,
+    roleFilter,
+  ]);
 
   function handleApproval(
     courseId: string,
@@ -175,9 +168,10 @@ function AdminDashboard() {
           </h1>
 
           <p>
-            Manage users, review
-            course submissions and
-            monitor platform activity.
+            Manage users, review course
+            submissions, monitor platform
+            analytics and moderate
+            administrative activity.
           </p>
         </div>
 
@@ -292,21 +286,31 @@ function AdminDashboard() {
         <button
           type="button"
           className={
-            activeTab ===
-            'approvals'
+            activeTab === 'analytics'
               ? 'active'
               : ''
           }
           onClick={() =>
-            setActiveTab(
-              'approvals',
-            )
+            setActiveTab('analytics')
+          }
+        >
+          Analytics
+        </button>
+
+        <button
+          type="button"
+          className={
+            activeTab === 'approvals'
+              ? 'active'
+              : ''
+          }
+          onClick={() =>
+            setActiveTab('approvals')
           }
         >
           Course approvals
 
-          {pendingApprovals >
-            0 && (
+          {pendingApprovals > 0 && (
             <span>
               {pendingApprovals}
             </span>
@@ -328,8 +332,7 @@ function AdminDashboard() {
         </button>
       </div>
 
-      {activeTab ===
-        'overview' && (
+      {activeTab === 'overview' && (
         <div className="admin-overview-grid">
           <section className="admin-panel admin-governance-panel">
             <div className="admin-panel-heading">
@@ -344,8 +347,8 @@ function AdminDashboard() {
 
                 <p>
                   Key administrative
-                  areas requiring
-                  regular review.
+                  areas requiring regular
+                  review.
                 </p>
               </div>
 
@@ -415,9 +418,40 @@ function AdminDashboard() {
                 </small>
               </button>
 
-              <article>
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveTab(
+                    'analytics',
+                  )
+                }
+              >
                 <div className="governance-icon green">
                   <Activity
+                    size={19}
+                  />
+                </div>
+
+                <section>
+                  <strong>
+                    Platform analytics
+                  </strong>
+
+                  <span>
+                    DAU, enrollment,
+                    completion and
+                    revenue
+                  </span>
+                </section>
+
+                <small>
+                  View
+                </small>
+              </button>
+
+              <article>
+                <div className="governance-icon green">
+                  <ShieldCheck
                     size={19}
                   />
                 </div>
@@ -525,9 +559,7 @@ function AdminDashboard() {
               {platformActivity.map(
                 (activity) => (
                   <article
-                    key={
-                      activity.id
-                    }
+                    key={activity.id}
                   >
                     <div
                       className={`activity-type-icon ${activity.type}`}
@@ -535,27 +567,21 @@ function AdminDashboard() {
                       {activity.type ===
                         'user' && (
                         <Users
-                          size={
-                            16
-                          }
+                          size={16}
                         />
                       )}
 
                       {activity.type ===
                         'course' && (
                         <BookOpen
-                          size={
-                            16
-                          }
+                          size={16}
                         />
                       )}
 
                       {activity.type ===
                         'system' && (
                         <Activity
-                          size={
-                            16
-                          }
+                          size={16}
                         />
                       )}
                     </div>
@@ -575,9 +601,7 @@ function AdminDashboard() {
                     </div>
 
                     <small>
-                      {
-                        activity.time
-                      }
+                      {activity.time}
                     </small>
                   </article>
                 ),
@@ -617,45 +641,35 @@ function AdminDashboard() {
                     'pending',
                 )
                 .slice(0, 3)
-                .map(
-                  (course) => (
-                    <article
-                      key={
-                        course.id
-                      }
-                    >
-                      <div>
-                        <BookOpen
-                          size={
-                            17
-                          }
-                        />
-                      </div>
+                .map((course) => (
+                  <article
+                    key={course.id}
+                  >
+                    <div>
+                      <BookOpen
+                        size={17}
+                      />
+                    </div>
 
-                      <section>
-                        <strong>
-                          {
-                            course.title
-                          }
-                        </strong>
+                    <section>
+                      <strong>
+                        {course.title}
+                      </strong>
 
-                        <span>
-                          By{' '}
-                          {
-                            course.instructor
-                          }
-                        </span>
-                      </section>
-
-                      <small>
+                      <span>
+                        By{' '}
                         {
-                          course.lessons
-                        }{' '}
-                        lessons
-                      </small>
-                    </article>
-                  ),
-                )}
+                          course.instructor
+                        }
+                      </span>
+                    </section>
+
+                    <small>
+                      {course.lessons}{' '}
+                      lessons
+                    </small>
+                  </article>
+                ))}
 
               {pendingApprovals ===
                 0 && (
@@ -678,6 +692,10 @@ function AdminDashboard() {
             </div>
           </section>
         </div>
+      )}
+
+      {activeTab === 'analytics' && (
+        <AdminAnalytics />
       )}
 
       {activeTab ===
@@ -727,15 +745,11 @@ function AdminDashboard() {
 
                   <div className="admin-course-main">
                     <span>
-                      {
-                        course.category
-                      }
+                      {course.category}
                     </span>
 
                     <h3>
-                      {
-                        course.title
-                      }
+                      {course.title}
                     </h3>
 
                     <p>
@@ -746,9 +760,7 @@ function AdminDashboard() {
                         }
                       </strong>{' '}
                       ·{' '}
-                      {
-                        course.lessons
-                      }{' '}
+                      {course.lessons}{' '}
                       lessons ·{' '}
                       {
                         course.submittedAt
@@ -797,9 +809,7 @@ function AdminDashboard() {
                         }
                       >
                         <XCircle
-                          size={
-                            15
-                          }
+                          size={15}
                         />
                         Reject
                       </button>
@@ -815,9 +825,7 @@ function AdminDashboard() {
                         }
                       >
                         <CheckCircle2
-                          size={
-                            15
-                          }
+                          size={15}
                         />
                         Approve
                       </button>
@@ -830,8 +838,7 @@ function AdminDashboard() {
         </section>
       )}
 
-      {activeTab ===
-        'users' && (
+      {activeTab === 'users' && (
         <section className="admin-management-section">
           <div className="admin-section-heading">
             <div>
@@ -868,15 +875,10 @@ function AdminDashboard() {
 
               <input
                 type="search"
-                value={
-                  userSearch
-                }
-                onChange={(
-                  event,
-                ) =>
+                value={userSearch}
+                onChange={(event) =>
                   setUserSearch(
-                    event.target
-                      .value,
+                    event.target.value,
                   )
                 }
                 placeholder="Search name or email..."
@@ -885,12 +887,9 @@ function AdminDashboard() {
 
             <select
               value={roleFilter}
-              onChange={(
-                event,
-              ) =>
+              onChange={(event) =>
                 setRoleFilter(
-                  event.target
-                    .value,
+                  event.target.value,
                 )
               }
               aria-label="Filter users by role"
@@ -921,41 +920,29 @@ function AdminDashboard() {
                   <th>Role</th>
                   <th>Joined</th>
                   <th>Status</th>
-                  <th>
-                    Actions
-                  </th>
+                  <th>Actions</th>
                 </tr>
               </thead>
 
               <tbody>
                 {filteredUsers.map(
                   (user) => (
-                    <tr
-                      key={
-                        user.id
-                      }
-                    >
+                    <tr key={user.id}>
                       <td>
                         <div className="admin-user-cell">
                           <div>
                             {user.name
-                              .charAt(
-                                0,
-                              )
+                              .charAt(0)
                               .toUpperCase()}
                           </div>
 
                           <section>
                             <strong>
-                              {
-                                user.name
-                              }
+                              {user.name}
                             </strong>
 
                             <span>
-                              {
-                                user.email
-                              }
+                              {user.email}
                             </span>
                           </section>
                         </div>
@@ -966,9 +953,7 @@ function AdminDashboard() {
                           <span
                             className={`admin-role-chip ${user.role}`}
                           >
-                            {
-                              user.role
-                            }
+                            {user.role}
                           </span>
 
                           <select
@@ -980,8 +965,7 @@ function AdminDashboard() {
                             ) =>
                               handleUserRole(
                                 user.id,
-                                event
-                                  .target
+                                event.target
                                   .value as AdminUserRole,
                               )
                             }
@@ -1003,18 +987,14 @@ function AdminDashboard() {
                       </td>
 
                       <td>
-                        {
-                          user.joinedAt
-                        }
+                        {user.joinedAt}
                       </td>
 
                       <td>
                         <span
                           className={`admin-user-status ${user.status}`}
                         >
-                          {
-                            user.status
-                          }
+                          {user.status}
                         </span>
                       </td>
 
@@ -1033,9 +1013,7 @@ function AdminDashboard() {
                               }
                             >
                               <UserX
-                                size={
-                                  14
-                                }
+                                size={14}
                               />
                               Suspend
                             </button>
@@ -1051,9 +1029,7 @@ function AdminDashboard() {
                               }
                             >
                               <UserCheck
-                                size={
-                                  14
-                                }
+                                size={14}
                               />
                               Activate
                             </button>
@@ -1071,11 +1047,8 @@ function AdminDashboard() {
                             aria-label={`Delete ${user.name}`}
                           >
                             <Trash2
-                              size={
-                                14
-                              }
+                              size={14}
                             />
-
                             Delete
                           </button>
                         </div>
@@ -1089,9 +1062,7 @@ function AdminDashboard() {
             {filteredUsers.length ===
               0 && (
               <div className="admin-empty-state">
-                <Users
-                  size={24}
-                />
+                <Users size={24} />
 
                 <strong>
                   No users found

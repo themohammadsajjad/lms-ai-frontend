@@ -11654,3 +11654,584 @@ html[data-theme='dark']
     justify-content: center;
   }
 }
+
+/* ==============================
+   Admin Platform Analytics
+   ============================== */
+
+.admin-analytics-section {
+  display: grid;
+  gap: 20px;
+}
+
+.admin-analytics-period {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 11px;
+  color: #6558d8;
+  border: 1px solid #dfdbff;
+  border-radius: 9px;
+  background: #f7f5ff;
+  font-size: 7px;
+  font-weight: 800;
+}
+
+/* Metric cards */
+
+.admin-analytics-metric-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-analytics-metric-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #e1e3ea;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.admin-analytics-metric-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.admin-analytics-metric-icon.purple {
+  color: #6558d8;
+  background: #f1efff;
+}
+
+.admin-analytics-metric-icon.blue {
+  color: #3f78c5;
+  background: #edf5ff;
+}
+
+.admin-analytics-metric-icon.green {
+  color: #378461;
+  background: #edf8f2;
+}
+
+.admin-analytics-metric-icon.orange {
+  color: #b87731;
+  background: #fff3e6;
+}
+
+.admin-analytics-metric-card > div:last-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-analytics-metric-card span {
+  color: #8a8f9f;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.admin-analytics-metric-card strong {
+  overflow: hidden;
+  color: #252b3e;
+  font-size: 17px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-analytics-metric-card small {
+  color: #a0a4b2;
+  font-size: 6px;
+}
+
+/* Main analytics grid */
+
+.admin-analytics-content-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.6fr)
+    minmax(240px, 0.7fr);
+  gap: 16px;
+}
+
+.admin-analytics-trend-panel,
+.admin-revenue-panel,
+.admin-analytics-summary {
+  border: 1px solid #e1e3ea;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.admin-analytics-trend-panel {
+  padding: 18px;
+}
+
+.admin-analytics-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.admin-analytics-panel-heading > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-analytics-panel-heading > div:first-child > span {
+  color: #6558d8;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-analytics-panel-heading h3 {
+  margin: 0;
+  color: #292f42;
+  font-size: 13px;
+}
+
+.admin-analytics-panel-heading p {
+  margin: 1px 0 0;
+  color: #8d92a2;
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+/* Legend */
+
+.admin-analytics-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.admin-analytics-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #777d8e;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.admin-analytics-legend i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+}
+
+.admin-analytics-legend
+  i.active-users {
+  background: #6558d8;
+}
+
+.admin-analytics-legend
+  i.enrollments {
+  background: #86a8e7;
+}
+
+/* Activity chart */
+
+.admin-analytics-chart {
+  display: grid;
+  grid-template-columns:
+    repeat(7, minmax(0, 1fr));
+  align-items: end;
+  gap: 11px;
+  min-height: 235px;
+  padding: 12px 8px 0;
+  border-bottom: 1px solid #ececf1;
+}
+
+.admin-analytics-chart-column {
+  display: grid;
+  height: 215px;
+  grid-template-rows:
+    minmax(0, 1fr) auto;
+  gap: 8px;
+  text-align: center;
+}
+
+.admin-analytics-bars {
+  display: flex;
+  height: 100%;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+}
+
+.admin-analytics-bar {
+  position: relative;
+  display: flex;
+  width: min(18px, 42%);
+  min-height: 14px;
+  align-items: flex-start;
+  justify-content: center;
+  border-radius: 5px 5px 2px 2px;
+  transition:
+    height 0.25s ease,
+    opacity 0.18s ease;
+}
+
+.admin-analytics-bar:hover {
+  opacity: 0.82;
+}
+
+.admin-analytics-bar.active-users {
+  background: linear-gradient(
+    180deg,
+    #8174e8,
+    #6558d8
+  );
+}
+
+.admin-analytics-bar.enrollments {
+  background: linear-gradient(
+    180deg,
+    #a9c1ef,
+    #7298db
+  );
+}
+
+.admin-analytics-bar span {
+  position: absolute;
+  top: -18px;
+  color: #6e7485;
+  font-size: 6px;
+  font-weight: 800;
+}
+
+.admin-analytics-chart-column small {
+  color: #8c91a2;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+/* Revenue panel */
+
+.admin-revenue-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+}
+
+.admin-revenue-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-revenue-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  color: #b87731;
+  border-radius: 10px;
+  background: #fff3e6;
+}
+
+.admin-revenue-panel-heading > div:last-child {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-revenue-panel-heading span {
+  color: #b87731;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-revenue-panel-heading h3 {
+  margin: 0;
+  color: #292f42;
+  font-size: 12px;
+}
+
+.admin-revenue-total {
+  display: block;
+  margin-top: 18px;
+  color: #272d40;
+  font-size: 27px;
+  letter-spacing: -0.6px;
+}
+
+.admin-revenue-caption {
+  margin: 6px 0 17px;
+  color: #858a9b;
+  font-size: 7px;
+  line-height: 1.6;
+}
+
+.admin-revenue-breakdown-list {
+  display: grid;
+  gap: 13px;
+  margin-top: auto;
+}
+
+.admin-revenue-breakdown-item {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px 10px;
+}
+
+.admin-revenue-breakdown-item > div:first-child {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.admin-revenue-breakdown-item span {
+  color: #6f7587;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.admin-revenue-breakdown-item strong {
+  color: #42485b;
+  font-size: 8px;
+}
+
+.admin-revenue-breakdown-item small {
+  color: #8d92a3;
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.admin-revenue-progress {
+  overflow: hidden;
+  height: 6px;
+  border-radius: 999px;
+  background: #ececf2;
+}
+
+.admin-revenue-progress > div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #6558d8,
+    #9489ed
+  );
+}
+
+/* Summary */
+
+.admin-analytics-summary {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+.admin-analytics-summary-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: #378461;
+  border-radius: 10px;
+  background: #edf8f2;
+}
+
+.admin-analytics-summary > div:nth-child(2) {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-analytics-summary span {
+  color: #378461;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-analytics-summary h3 {
+  margin: 0;
+  color: #30364a;
+  font-size: 11px;
+}
+
+.admin-analytics-summary p {
+  margin: 2px 0 0;
+  color: #7e8495;
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+.admin-analytics-summary p strong {
+  color: #4b5164;
+}
+
+.admin-analytics-summary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  color: #6558d8;
+  border: 1px solid #dfdbff;
+  border-radius: 8px;
+  background: #f7f5ff;
+  font-size: 7px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* Dark mode */
+
+html[data-theme='dark']
+  .admin-analytics-period,
+html[data-theme='dark']
+  .admin-analytics-summary-badge {
+  color: #aaa1ff;
+  border-color: #494268;
+  background: #27233f;
+}
+
+html[data-theme='dark']
+  .admin-analytics-metric-card,
+html[data-theme='dark']
+  .admin-analytics-trend-panel,
+html[data-theme='dark']
+  .admin-revenue-panel,
+html[data-theme='dark']
+  .admin-analytics-summary {
+  border-color: #303546;
+  background: #191e2d;
+}
+
+html[data-theme='dark']
+  .admin-analytics-metric-card strong,
+html[data-theme='dark']
+  .admin-analytics-panel-heading h3,
+html[data-theme='dark']
+  .admin-revenue-panel-heading h3,
+html[data-theme='dark']
+  .admin-revenue-total,
+html[data-theme='dark']
+  .admin-analytics-summary h3 {
+  color: #e4e6ee;
+}
+
+html[data-theme='dark']
+  .admin-analytics-panel-heading p,
+html[data-theme='dark']
+  .admin-revenue-caption,
+html[data-theme='dark']
+  .admin-analytics-summary p {
+  color: #aeb3c2;
+}
+
+html[data-theme='dark']
+  .admin-analytics-summary p strong,
+html[data-theme='dark']
+  .admin-revenue-breakdown-item strong {
+  color: #d9dce5;
+}
+
+html[data-theme='dark']
+  .admin-analytics-chart {
+  border-color: #303546;
+}
+
+html[data-theme='dark']
+  .admin-analytics-bar span,
+html[data-theme='dark']
+  .admin-analytics-chart-column small,
+html[data-theme='dark']
+  .admin-analytics-legend span,
+html[data-theme='dark']
+  .admin-revenue-breakdown-item span,
+html[data-theme='dark']
+  .admin-revenue-breakdown-item small {
+  color: #adb2c1;
+}
+
+html[data-theme='dark']
+  .admin-revenue-progress {
+  background: #2d3242;
+}
+
+html[data-theme='dark']
+  .admin-analytics-summary-icon {
+  color: #83c6a5;
+  background: #1c3027;
+}
+
+html[data-theme='dark']
+  .admin-revenue-icon {
+  color: #dda45f;
+  background: #382a1f;
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+  .admin-analytics-metric-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-analytics-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-revenue-breakdown-list {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 700px) {
+  .admin-analytics-metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-analytics-panel-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-analytics-legend {
+    justify-content: flex-start;
+  }
+
+  .admin-analytics-chart {
+    min-width: 560px;
+  }
+
+  .admin-analytics-trend-panel {
+    overflow-x: auto;
+  }
+
+  .admin-analytics-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-analytics-summary-badge {
+    width: fit-content;
+  }
+}
