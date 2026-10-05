@@ -13,6 +13,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
+import InstructorAnnouncements from '../components/instructor/InstructorAnnouncements';
 import InstructorAssignments from '../components/instructor/InstructorAssignments';
 import InstructorMaterials from '../components/instructor/InstructorMaterials';
 import {
@@ -26,6 +27,7 @@ type InstructorTab =
   | 'courses'
   | 'materials'
   | 'assignments'
+  | 'announcements'
   | 'reviews'
   | 'ai-quizzes';
 
@@ -200,8 +202,9 @@ function InstructorDashboard() {
           <p>
             Manage courses, learning
             materials, assignments,
-            learners, student submissions
-            and AI-generated assessments.
+            announcements, learners,
+            student submissions and
+            AI-generated assessments.
           </p>
         </div>
 
@@ -355,6 +358,23 @@ function InstructorDashboard() {
           }
         >
           Assignments
+        </button>
+
+        <button
+          type="button"
+          className={
+            activeTab ===
+            'announcements'
+              ? 'active'
+              : ''
+          }
+          onClick={() =>
+            setActiveTab(
+              'announcements',
+            )
+          }
+        >
+          Announcements
         </button>
 
         <button
@@ -887,6 +907,11 @@ function InstructorDashboard() {
       {activeTab ===
         'assignments' && (
         <InstructorAssignments />
+      )}
+
+      {activeTab ===
+        'announcements' && (
+        <InstructorAnnouncements />
       )}
 
       {activeTab === 'reviews' && (
