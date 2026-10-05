@@ -1,12 +1,18 @@
 import {
   Bell,
   Check,
+  Languages,
   Laptop,
   Moon,
   Settings as SettingsIcon,
   Sun,
 } from 'lucide-react';
 import { useState } from 'react';
+import {
+  i18nService,
+  type AppLanguage,
+  type TranslationKey,
+} from '../services/i18nService';
 import {
   settingsService,
   type ThemePreference,
@@ -18,47 +24,103 @@ function Settings() {
       settingsService.getTheme(),
     );
 
-  const [emailNotifications, setEmailNotifications] =
-    useState(
-      settingsService.getEmailNotifications(),
-    );
+  const [
+    emailNotifications,
+    setEmailNotifications,
+  ] = useState(
+    settingsService.getEmailNotifications(),
+  );
 
-  const [learningReminders, setLearningReminders] =
-    useState(
-      settingsService.getLearningReminders(),
-    );
+  const [
+    learningReminders,
+    setLearningReminders,
+  ] = useState(
+    settingsService.getLearningReminders(),
+  );
 
-  function handleTheme(nextTheme: ThemePreference) {
+  const [
+    language,
+    setLanguage,
+  ] = useState<AppLanguage>(
+    i18nService.getLanguage(),
+  );
+
+  function t(
+    key: TranslationKey,
+  ) {
+    return i18nService.translate(
+      key,
+      language,
+    );
+  }
+
+  function handleTheme(
+    nextTheme: ThemePreference,
+  ) {
     setTheme(nextTheme);
-    settingsService.setTheme(nextTheme);
+
+    settingsService.setTheme(
+      nextTheme,
+    );
   }
 
   function handleEmailNotifications() {
-    const nextValue = !emailNotifications;
+    const nextValue =
+      !emailNotifications;
 
-    setEmailNotifications(nextValue);
-    settingsService.setEmailNotifications(nextValue);
+    setEmailNotifications(
+      nextValue,
+    );
+
+    settingsService.setEmailNotifications(
+      nextValue,
+    );
   }
 
   function handleLearningReminders() {
-    const nextValue = !learningReminders;
+    const nextValue =
+      !learningReminders;
 
-    setLearningReminders(nextValue);
-    settingsService.setLearningReminders(nextValue);
+    setLearningReminders(
+      nextValue,
+    );
+
+    settingsService.setLearningReminders(
+      nextValue,
+    );
+  }
+
+  function handleLanguage(
+    nextLanguage: AppLanguage,
+  ) {
+    setLanguage(
+      nextLanguage,
+    );
+
+    i18nService.setLanguage(
+      nextLanguage,
+    );
   }
 
   return (
     <section className="settings-page">
       <div className="settings-heading">
         <span className="eyebrow">
-          Personalization
+          {t(
+            'settings.personalization',
+          )}
         </span>
 
-        <h1>Settings</h1>
+        <h1>
+          {t(
+            'settings.title',
+          )}
+        </h1>
 
         <p>
-          Customize your VertexLearn workspace and
-          notification preferences.
+          {t(
+            'settings.description',
+          )}
         </p>
       </div>
 
@@ -66,14 +128,22 @@ function Settings() {
         <section className="settings-card">
           <div className="settings-card-heading">
             <div className="settings-heading-icon">
-              <Laptop size={20} />
+              <Laptop
+                size={20}
+              />
             </div>
 
             <div>
-              <h2>Appearance</h2>
+              <h2>
+                {t(
+                  'settings.appearance',
+                )}
+              </h2>
 
               <p>
-                Choose how the learning workspace looks.
+                {t(
+                  'settings.appearanceDescription',
+                )}
               </p>
             </div>
           </div>
@@ -82,46 +152,81 @@ function Settings() {
             <button
               type="button"
               className={
-                theme === 'light' ? 'active' : ''
+                theme ===
+                'light'
+                  ? 'active'
+                  : ''
               }
-              onClick={() => handleTheme('light')}
+              onClick={() =>
+                handleTheme(
+                  'light',
+                )
+              }
             >
               <div>
-                <Sun size={21} />
+                <Sun
+                  size={21}
+                />
               </div>
 
               <section>
-                <strong>Light mode</strong>
+                <strong>
+                  Light mode
+                </strong>
+
                 <span>
-                  Bright workspace with light surfaces.
+                  Bright workspace
+                  with light
+                  surfaces.
                 </span>
               </section>
 
-              {theme === 'light' && (
-                <Check size={18} />
+              {theme ===
+                'light' && (
+                <Check
+                  size={18}
+                />
               )}
             </button>
 
             <button
               type="button"
               className={
-                theme === 'dark' ? 'active' : ''
+                theme ===
+                'dark'
+                  ? 'active'
+                  : ''
               }
-              onClick={() => handleTheme('dark')}
+              onClick={() =>
+                handleTheme(
+                  'dark',
+                )
+              }
             >
               <div>
-                <Moon size={21} />
+                <Moon
+                  size={21}
+                />
               </div>
 
               <section>
-                <strong>Dark mode</strong>
+                <strong>
+                  Dark mode
+                </strong>
+
                 <span>
-                  Reduced brightness for dark environments.
+                  Reduced
+                  brightness for
+                  dark
+                  environments.
                 </span>
               </section>
 
-              {theme === 'dark' && (
-                <Check size={18} />
+              {theme ===
+                'dark' && (
+                <Check
+                  size={18}
+                />
               )}
             </button>
           </div>
@@ -130,14 +235,22 @@ function Settings() {
         <section className="settings-card">
           <div className="settings-card-heading">
             <div className="settings-heading-icon">
-              <Bell size={20} />
+              <Bell
+                size={20}
+              />
             </div>
 
             <div>
-              <h2>Notifications</h2>
+              <h2>
+                {t(
+                  'settings.notifications',
+                )}
+              </h2>
 
               <p>
-                Control learning alerts and reminders.
+                {t(
+                  'settings.notificationsDescription',
+                )}
               </p>
             </div>
           </div>
@@ -145,20 +258,32 @@ function Settings() {
           <div className="settings-preference-list">
             <article>
               <div>
-                <strong>Email notifications</strong>
+                <strong>
+                  Email
+                  notifications
+                </strong>
 
                 <span>
-                  Receive assignment and course updates.
+                  Receive
+                  assignment and
+                  course updates.
                 </span>
               </div>
 
               <button
                 type="button"
                 className={`settings-toggle ${
-                  emailNotifications ? 'enabled' : ''
+                  emailNotifications
+                    ? 'enabled'
+                    : ''
                 }`}
-                onClick={handleEmailNotifications}
+                onClick={
+                  handleEmailNotifications
+                }
                 aria-label="Toggle email notifications"
+                aria-pressed={
+                  emailNotifications
+                }
               >
                 <span />
               </button>
@@ -166,10 +291,15 @@ function Settings() {
 
             <article>
               <div>
-                <strong>Learning reminders</strong>
+                <strong>
+                  Learning
+                  reminders
+                </strong>
 
                 <span>
-                  Get reminders about pending learning
+                  Get reminders
+                  about pending
+                  learning
                   activities.
                 </span>
               </div>
@@ -177,10 +307,17 @@ function Settings() {
               <button
                 type="button"
                 className={`settings-toggle ${
-                  learningReminders ? 'enabled' : ''
+                  learningReminders
+                    ? 'enabled'
+                    : ''
                 }`}
-                onClick={handleLearningReminders}
+                onClick={
+                  handleLearningReminders
+                }
                 aria-label="Toggle learning reminders"
+                aria-pressed={
+                  learningReminders
+                }
               >
                 <span />
               </button>
@@ -188,39 +325,176 @@ function Settings() {
           </div>
         </section>
 
-        <section className="settings-card settings-info-card">
+        <section className="settings-card">
           <div className="settings-card-heading">
             <div className="settings-heading-icon">
-              <SettingsIcon size={20} />
+              <Languages
+                size={20}
+              />
             </div>
 
             <div>
-              <h2>Platform preferences</h2>
+              <h2>
+                {t(
+                  'settings.language',
+                )}
+              </h2>
 
               <p>
-                Settings are stored locally for this
-                frontend demo.
+                {t(
+                  'settings.languageDescription',
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="language-options">
+            <button
+              type="button"
+              className={
+                language ===
+                'en'
+                  ? 'active'
+                  : ''
+              }
+              onClick={() =>
+                handleLanguage(
+                  'en',
+                )
+              }
+              aria-pressed={
+                language ===
+                'en'
+              }
+            >
+              <div className="language-option-code">
+                EN
+              </div>
+
+              <section>
+                <strong>
+                  English
+                </strong>
+
+                <span>
+                  English
+                  interface
+                </span>
+              </section>
+
+              {language ===
+                'en' && (
+                <Check
+                  size={18}
+                />
+              )}
+            </button>
+
+            <button
+              type="button"
+              className={
+                language ===
+                'hi'
+                  ? 'active'
+                  : ''
+              }
+              onClick={() =>
+                handleLanguage(
+                  'hi',
+                )
+              }
+              aria-pressed={
+                language ===
+                'hi'
+              }
+            >
+              <div className="language-option-code">
+                HI
+              </div>
+
+              <section>
+                <strong>
+                  हिंदी
+                </strong>
+
+                <span>
+                  हिंदी इंटरफेस
+                </span>
+              </section>
+
+              {language ===
+                'hi' && (
+                <Check
+                  size={18}
+                />
+              )}
+            </button>
+          </div>
+        </section>
+
+        <section className="settings-card settings-info-card">
+          <div className="settings-card-heading">
+            <div className="settings-heading-icon">
+              <SettingsIcon
+                size={20}
+              />
+            </div>
+
+            <div>
+              <h2>
+                {t(
+                  'settings.platformPreferences',
+                )}
+              </h2>
+
+              <p>
+                {t(
+                  'settings.savedLocally',
+                )}
               </p>
             </div>
           </div>
 
           <div className="settings-info-row">
-            <span>Theme</span>
+            <span>
+              Theme
+            </span>
+
             <strong>
-              {theme === 'dark'
+              {theme ===
+              'dark'
                 ? 'Dark mode'
                 : 'Light mode'}
             </strong>
           </div>
 
           <div className="settings-info-row">
-            <span>Language</span>
-            <strong>English</strong>
+            <span>
+              {t(
+                'settings.language',
+              )}
+            </span>
+
+            <strong>
+              {language ===
+              'hi'
+                ? t(
+                    'settings.hindi',
+                  )
+                : t(
+                    'settings.english',
+                  )}
+            </strong>
           </div>
 
           <div className="settings-info-row">
-            <span>Workspace</span>
-            <strong>VertexLearn</strong>
+            <span>
+              Workspace
+            </span>
+
+            <strong>
+              VertexLearn
+            </strong>
           </div>
         </section>
       </div>
