@@ -9,11 +9,6 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import {
-  PDFDocument,
-  StandardFonts,
-  rgb,
-} from 'pdf-lib';
 import { useState } from 'react';
 import {
   badges,
@@ -26,17 +21,25 @@ import { engagementService } from '../services/engagementService';
 function Certificates() {
   const [, setVersion] = useState(0);
 
-  const earnedCertificates = certificates.filter(
-    (certificate) => certificate.status === 'earned',
-  );
+  const earnedCertificates =
+    certificates.filter(
+      (certificate) =>
+        certificate.status ===
+        'earned',
+    );
 
-  const inProgressCertificates = certificates.filter(
-    (certificate) => certificate.status === 'in-progress',
-  );
+  const inProgressCertificates =
+    certificates.filter(
+      (certificate) =>
+        certificate.status ===
+        'in-progress',
+    );
 
-  const earnedBadges = badges.filter(
-    (badge) => badge.earned,
-  );
+  const earnedBadges =
+    badges.filter(
+      (badge) =>
+        badge.earned,
+    );
 
   function handleViewCertificate(
     certificateId: string,
@@ -45,24 +48,38 @@ function Certificates() {
       certificateId,
     );
 
-    setVersion((value) => value + 1);
+    setVersion(
+      (value) =>
+        value + 1,
+    );
   }
 
   async function handleDownloadCertificate(
     certificate: Certificate,
   ) {
-    const user = authService.getCurrentUser();
+    const user =
+      authService.getCurrentUser();
 
     const studentName =
-      user?.name || 'VertexLearn Student';
+      user?.name ||
+      'VertexLearn Student';
+
+    const {
+      PDFDocument,
+      StandardFonts,
+      rgb,
+    } = await import(
+      'pdf-lib'
+    );
 
     const pdfDocument =
       await PDFDocument.create();
 
-    const page = pdfDocument.addPage([
-      842,
-      595,
-    ]);
+    const page =
+      pdfDocument.addPage([
+        842,
+        595,
+      ]);
 
     const regularFont =
       await pdfDocument.embedFont(
@@ -74,26 +91,32 @@ function Certificates() {
         StandardFonts.HelveticaBold,
       );
 
-    const width = page.getWidth();
-    const height = page.getHeight();
+    const width =
+      page.getWidth();
 
-    const purple = rgb(
-      0.4,
-      0.35,
-      0.85,
-    );
+    const height =
+      page.getHeight();
 
-    const navy = rgb(
-      0.08,
-      0.09,
-      0.18,
-    );
+    const purple =
+      rgb(
+        0.4,
+        0.35,
+        0.85,
+      );
 
-    const gray = rgb(
-      0.38,
-      0.4,
-      0.48,
-    );
+    const navy =
+      rgb(
+        0.08,
+        0.09,
+        0.18,
+      );
+
+    const gray =
+      rgb(
+        0.38,
+        0.4,
+        0.48,
+      );
 
     function drawCenteredText(
       text: string,
@@ -108,35 +131,47 @@ function Certificates() {
           size,
         );
 
-      page.drawText(text, {
-        x: (width - textWidth) / 2,
-        y,
-        size,
-        font,
-        color,
-      });
+      page.drawText(
+        text,
+        {
+          x:
+            (width -
+              textWidth) /
+            2,
+          y,
+          size,
+          font,
+          color,
+        },
+      );
     }
 
     page.drawRectangle({
       x: 20,
       y: 20,
-      width: width - 40,
-      height: height - 40,
+      width:
+        width - 40,
+      height:
+        height - 40,
       borderWidth: 4,
-      borderColor: purple,
+      borderColor:
+        purple,
     });
 
     page.drawRectangle({
       x: 32,
       y: 32,
-      width: width - 64,
-      height: height - 64,
+      width:
+        width - 64,
+      height:
+        height - 64,
       borderWidth: 1,
-      borderColor: rgb(
-        0.78,
-        0.76,
-        0.92,
-      ),
+      borderColor:
+        rgb(
+          0.78,
+          0.76,
+          0.92,
+        ),
     });
 
     drawCenteredText(
@@ -222,20 +257,25 @@ function Certificates() {
     const pdfBytes =
       await pdfDocument.save();
 
-    const buffer = new ArrayBuffer(
-      pdfBytes.byteLength,
-    );
+    const buffer =
+      new ArrayBuffer(
+        pdfBytes.byteLength,
+      );
 
-    new Uint8Array(buffer).set(
+    new Uint8Array(
+      buffer,
+    ).set(
       pdfBytes,
     );
 
-    const pdfBlob = new Blob(
-      [buffer],
-      {
-        type: 'application/pdf',
-      },
-    );
+    const pdfBlob =
+      new Blob(
+        [buffer],
+        {
+          type:
+            'application/pdf',
+        },
+      );
 
     const downloadUrl =
       URL.createObjectURL(
@@ -255,9 +295,12 @@ function Certificates() {
         );
 
     const link =
-      document.createElement('a');
+      document.createElement(
+        'a',
+      );
 
-    link.href = downloadUrl;
+    link.href =
+      downloadUrl;
 
     link.download =
       `${safeCourseName}-certificate.pdf`;
@@ -281,7 +324,8 @@ function Certificates() {
     );
 
     setVersion(
-      (value) => value + 1,
+      (value) =>
+        value + 1,
     );
   }
 
@@ -298,20 +342,25 @@ function Certificates() {
           </h1>
 
           <p>
-            Track your learning milestones,
-            earned credentials and achievement
-            progress.
+            Track your learning
+            milestones, earned
+            credentials and
+            achievement progress.
           </p>
         </div>
 
         <div className="achievement-score">
           <div>
-            <Award size={20} />
+            <Award
+              size={20}
+            />
           </div>
 
           <section>
             <strong>
-              {earnedCertificates.length}
+              {
+                earnedCertificates.length
+              }
             </strong>
 
             <span>
@@ -324,7 +373,9 @@ function Certificates() {
       <div className="achievement-stats-grid">
         <article>
           <div className="achievement-stat-icon purple">
-            <Award size={20} />
+            <Award
+              size={20}
+            />
           </div>
 
           <div>
@@ -333,11 +384,14 @@ function Certificates() {
             </span>
 
             <strong>
-              {earnedCertificates.length}
+              {
+                earnedCertificates.length
+              }
             </strong>
 
             <small>
-              Completed credentials
+              Completed
+              credentials
             </small>
           </div>
         </article>
@@ -355,18 +409,23 @@ function Certificates() {
             </span>
 
             <strong>
-              {earnedBadges.length}
+              {
+                earnedBadges.length
+              }
             </strong>
 
             <small>
-              Learning achievements
+              Learning
+              achievements
             </small>
           </div>
         </article>
 
         <article>
           <div className="achievement-stat-icon orange">
-            <Flame size={20} />
+            <Flame
+              size={20}
+            />
           </div>
 
           <div>
@@ -401,7 +460,8 @@ function Certificates() {
             </strong>
 
             <small>
-              Total achievement score
+              Total achievement
+              score
             </small>
           </div>
         </article>
@@ -415,8 +475,9 @@ function Certificates() {
             </h2>
 
             <p>
-              Credentials earned by
-              completing learning paths.
+              Credentials earned
+              by completing
+              learning paths.
             </p>
           </div>
         </div>
@@ -452,14 +513,15 @@ function Certificates() {
                       <CheckCircle2
                         size={13}
                       />
+
                       Earned
                     </span>
                   </div>
 
                   <div className="certificate-content">
                     <span>
-                      Certificate of
-                      completion
+                      Certificate
+                      of completion
                     </span>
 
                     <h3>
@@ -470,8 +532,10 @@ function Certificates() {
 
                     <p>
                       Awarded for
-                      successfully completing
-                      all required learning
+                      successfully
+                      completing all
+                      required
+                      learning
                       activities and
                       assessments.
                     </p>
@@ -554,16 +618,21 @@ function Certificates() {
               </h2>
 
               <p>
-                Complete the remaining
-                learning activities to
-                unlock your certificate.
+                Complete the
+                remaining
+                learning
+                activities to
+                unlock your
+                certificate.
               </p>
             </div>
           </div>
 
           <div className="certificate-progress-list">
             {inProgressCertificates.map(
-              (certificate) => (
+              (
+                certificate,
+              ) => (
                 <article
                   className="certificate-progress-card"
                   key={
@@ -578,8 +647,8 @@ function Certificates() {
 
                   <div className="certificate-progress-info">
                     <span>
-                      Certificate in
-                      progress
+                      Certificate
+                      in progress
                     </span>
 
                     <h3>
@@ -618,15 +687,19 @@ function Certificates() {
             </h2>
 
             <p>
-              Milestones earned through
-              learning activity and
+              Milestones earned
+              through learning
+              activity and
               progress.
             </p>
           </div>
 
           <span className="badge-count">
-            {earnedBadges.length}/
-            {badges.length} unlocked
+            {
+              earnedBadges.length
+            }
+            /{badges.length}{' '}
+            unlocked
           </span>
         </div>
 
@@ -648,15 +721,18 @@ function Certificates() {
               >
                 <div
                   className={`badge-icon badge-icon-${
-                    (index % 4) + 1
+                    (index % 4) +
+                    1
                   }`}
                 >
-                  {index % 3 ===
+                  {index %
+                    3 ===
                   0 ? (
                     <Flame
                       size={22}
                     />
-                  ) : index % 3 ===
+                  ) : index %
+                      3 ===
                     1 ? (
                     <Medal
                       size={22}
@@ -669,15 +745,21 @@ function Certificates() {
                 </div>
 
                 <span>
-                  {badge.category}
+                  {
+                    badge.category
+                  }
                 </span>
 
                 <h3>
-                  {badge.title}
+                  {
+                    badge.title
+                  }
                 </h3>
 
                 <p>
-                  {badge.description}
+                  {
+                    badge.description
+                  }
                 </p>
 
                 <div className="badge-state">
@@ -686,6 +768,7 @@ function Certificates() {
                       <CheckCircle2
                         size={14}
                       />
+
                       Unlocked
                     </>
                   ) : (
@@ -693,6 +776,7 @@ function Certificates() {
                       <ShieldCheck
                         size={14}
                       />
+
                       Locked
                     </>
                   )}
