@@ -12830,3 +12830,16 @@ html[data-theme='dark']
     width: 100%;
   }
 }
+
+/* Student instructor announcement notifications */
+
+.notification-type-icon.announcement {
+  color: #9a6524;
+  background: #fff4df;
+}
+
+html[data-theme='dark']
+  .notification-type-icon.announcement {
+  color: #e2b36d;
+  background: #3b2e1d;
+}
