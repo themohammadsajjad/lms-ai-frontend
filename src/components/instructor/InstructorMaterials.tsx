@@ -9,7 +9,6 @@ import {
   Upload,
 } from 'lucide-react';
 import {
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -50,13 +49,19 @@ function formatFileSize(
 function getMaterialIcon(
   type: MaterialType,
 ) {
-  if (type === 'video') {
+  if (
+    type === 'video'
+  ) {
     return (
-      <Film size={18} />
+      <Film
+        size={18}
+      />
     );
   }
 
-  if (type === 'slides') {
+  if (
+    type === 'slides'
+  ) {
     return (
       <Presentation
         size={18}
@@ -65,7 +70,9 @@ function getMaterialIcon(
   }
 
   return (
-    <FileText size={18} />
+    <FileText
+      size={18}
+    />
   );
 }
 
@@ -96,7 +103,9 @@ function getModuleNames(
 }
 
 function getLectureNames(
-  courseTitle: string | undefined,
+  courseTitle:
+    | string
+    | undefined,
   moduleName: string,
 ): string[] {
   const course =
@@ -145,10 +154,12 @@ function InstructorMaterials() {
       initialModule,
     );
 
-  const [courseId, setCourseId] =
-    useState(
-      firstCourse?.id ?? '',
-    );
+  const [
+    courseId,
+    setCourseId,
+  ] = useState(
+    firstCourse?.id ?? '',
+  );
 
   const [
     moduleName,
@@ -164,8 +175,10 @@ function InstructorMaterials() {
     firstLectures[0] ?? '',
   );
 
-  const [title, setTitle] =
-    useState('');
+  const [
+    title,
+    setTitle,
+  ] = useState('');
 
   const [
     materialType,
@@ -203,60 +216,30 @@ function InstructorMaterials() {
     );
 
   const moduleOptions =
-    useMemo(
-      () =>
-        getModuleNames(
-          selectedCourse?.title,
-        ),
-      [
-        selectedCourse
-          ?.title,
-      ],
+    getModuleNames(
+      selectedCourse?.title,
     );
 
   const lectureOptions =
-    useMemo(
-      () =>
-        getLectureNames(
-          selectedCourse?.title,
-          moduleName,
-        ),
-      [
-        selectedCourse
-          ?.title,
-        moduleName,
-      ],
+    getLectureNames(
+      selectedCourse?.title,
+      moduleName,
     );
 
   const courseMaterials =
-    useMemo(
-      () =>
-        materials.filter(
-          (material) =>
-            material.courseId ===
-            courseId,
-        ),
-      [
-        materials,
+    materials.filter(
+      (material) =>
+        material.courseId ===
         courseId,
-      ],
     );
 
   const lectureMaterials =
-    useMemo(
-      () =>
-        courseMaterials.filter(
-          (material) =>
-            material.moduleName ===
-              moduleName &&
-            material.lectureName ===
-              lectureName,
-        ),
-      [
-        courseMaterials,
-        moduleName,
-        lectureName,
-      ],
+    courseMaterials.filter(
+      (material) =>
+        material.moduleName ===
+          moduleName &&
+        material.lectureName ===
+          lectureName,
     );
 
   function getAcceptValue() {
@@ -279,6 +262,7 @@ function InstructorMaterials() {
 
   function resetUploadFields() {
     setTitle('');
+
     setSelectedFile(
       null,
     );
@@ -500,8 +484,7 @@ function InstructorMaterials() {
                     event,
                   ) =>
                     handleModuleChange(
-                      event
-                        .target
+                      event.target
                         .value,
                     )
                   }
@@ -516,7 +499,9 @@ function InstructorMaterials() {
                           module
                         }
                       >
-                        {module}
+                        {
+                          module
+                        }
                       </option>
                     ),
                   )}
@@ -531,8 +516,7 @@ function InstructorMaterials() {
                     event,
                   ) => {
                     setModuleName(
-                      event
-                        .target
+                      event.target
                         .value,
                     );
 
@@ -560,8 +544,7 @@ function InstructorMaterials() {
                     event,
                   ) => {
                     setLectureName(
-                      event
-                        .target
+                      event.target
                         .value,
                     );
 
@@ -595,8 +578,7 @@ function InstructorMaterials() {
                     event,
                   ) =>
                     setLectureName(
-                      event
-                        .target
+                      event.target
                         .value,
                     )
                   }
@@ -618,8 +600,7 @@ function InstructorMaterials() {
                   event,
                 ) => {
                   setMaterialType(
-                    event
-                      .target
+                    event.target
                       .value as MaterialType,
                   );
 
@@ -656,13 +637,14 @@ function InstructorMaterials() {
 
               <input
                 type="text"
-                value={title}
+                value={
+                  title
+                }
                 onChange={(
                   event,
                 ) =>
                   setTitle(
-                    event
-                      .target
+                    event.target
                       .value,
                   )
                 }

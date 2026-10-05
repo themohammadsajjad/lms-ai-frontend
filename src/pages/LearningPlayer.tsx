@@ -9,7 +9,6 @@ import {
   Save,
 } from 'lucide-react';
 import {
-  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -18,8 +17,14 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { lessonsByCourse } from '../data/learningData';
-import { courses } from '../data/mockData';
+import {
+  lessonsByCourse,
+  type Lesson,
+} from '../data/learningData';
+import {
+  courses,
+  type Course,
+} from '../data/mockData';
 import { learningService } from '../services/learningService';
 
 function formatTimestamp(
@@ -27,7 +32,9 @@ function formatTimestamp(
 ) {
   const seconds = Math.max(
     0,
-    Math.floor(totalSeconds),
+    Math.floor(
+      totalSeconds,
+    ),
   );
 
   const minutes = Math.floor(
@@ -42,54 +49,76 @@ function formatTimestamp(
     .padStart(2, '0')}`;
 }
 
-function LearningPlayer() {
-  const { courseId, lessonId } =
-    useParams();
+interface LessonPlayerProps {
+  course: Course;
+  lessons: Lesson[];
+  currentLesson: Lesson;
+  currentIndex: number;
+}
 
-  const navigate = useNavigate();
+function LessonPlayer({
+  course,
+  lessons,
+  currentLesson,
+  currentIndex,
+}: LessonPlayerProps) {
+  const navigate =
+    useNavigate();
 
   const videoRef =
-    useRef<HTMLVideoElement>(null);
+    useRef<HTMLVideoElement>(
+      null,
+    );
 
   const lastSavedSecond =
     useRef(-1);
 
-  const course = courses.find(
-    (item) => item.id === courseId,
+  const [
+    note,
+    setNote,
+  ] = useState(
+    () =>
+      learningService.getNoteDetails(
+        course.id,
+        currentLesson.id,
+      ).content,
   );
 
-  const lessons = course
-    ? lessonsByCourse[course.id] ?? []
-    : [];
-
-  const currentLesson =
-    lessons.find(
-      (lesson) =>
-        lesson.id === lessonId,
-    ) ?? lessons[0];
-
-  const currentIndex =
-    lessons.findIndex(
-      (lesson) =>
-        lesson.id ===
-        currentLesson?.id,
-    );
-
-  const [note, setNote] =
-    useState('');
-
-  const [noteTimestamp, setNoteTimestamp] =
-    useState(0);
+  const [
+    noteTimestamp,
+    setNoteTimestamp,
+  ] = useState(
+    () =>
+      learningService.getNoteDetails(
+        course.id,
+        currentLesson.id,
+      ).timestamp,
+  );
 
   const [
     bookmarked,
     setBookmarked,
-  ] = useState(false);
+  ] = useState(
+    () =>
+      learningService.isBookmarked(
+        course.id,
+        currentLesson.id,
+      ),
+  );
 
   const [
     bookmarkTimestamp,
     setBookmarkTimestamp,
-  ] = useState<number | null>(null);
+  ] = useState<
+    number | null
+  >(
+    () =>
+      learningService.getBookmarkDetails(
+        course.id,
+        currentLesson.id,
+      )?.timestamp ??
+      null,
+  );
 
   const [
     currentTime,
@@ -101,80 +130,18 @@ function LearningPlayer() {
     setPlaybackRate,
   ] = useState(1);
 
-  const [, setVersion] =
-    useState(0);
-
-  useEffect(() => {
-    if (!course || !currentLesson) {
-      return;
-    }
-
-    const noteDetails =
-      learningService.getNoteDetails(
-        course.id,
-        currentLesson.id,
-      );
-
-    const bookmarkDetails =
-      learningService.getBookmarkDetails(
-        course.id,
-        currentLesson.id,
-      );
-
-    setNote(noteDetails.content);
-    setNoteTimestamp(
-      noteDetails.timestamp,
-    );
-
-    setBookmarked(
-      learningService.isBookmarked(
-        course.id,
-        currentLesson.id,
-      ),
-    );
-
-    setBookmarkTimestamp(
-      bookmarkDetails?.timestamp ??
-        null,
-    );
-
-    setCurrentTime(0);
-    setPlaybackRate(1);
-
-    lastSavedSecond.current = -1;
-  }, [course, currentLesson]);
-
-  if (!course || !currentLesson) {
-    return (
-      <section className="learning-empty-state">
-        <PlayCircle size={38} />
-
-        <h1>
-          Learning content unavailable
-        </h1>
-
-        <p>
-          This course does not have demo
-          lessons yet.
-        </p>
-
-        <Link to="/courses">
-          Return to courses
-        </Link>
-      </section>
-    );
-  }
-
-  const activeCourse = course;
-  const activeLesson =
-    currentLesson;
+  const [
+    ,
+    setVersion,
+  ] = useState(0);
 
   const completedCount =
-    lessons.filter((lesson) =>
-      learningService.isCompleted(
-        activeCourse.id,
-        lesson.id,
-      ),
+    lessons.filter(
+      (lesson) =>
+        learningService.isCompleted(
+          course.id,
+          lesson.id,
+        ),
     ).length;
 
   const progress =
@@ -188,12 +155,14 @@ function LearningPlayer() {
 
   const currentCompleted =
     learningService.isCompleted(
-      activeCourse.id,
-      activeLesson.id,
+      course.id,
+      currentLesson.id,
     );
 
   const nextLesson =
-    lessons[currentIndex + 1];
+    lessons[
+      currentIndex + 1
+    ];
 
   function handleLoadedMetadata() {
     const video =
@@ -205,8 +174,8 @@ function LearningPlayer() {
 
     const savedPosition =
       learningService.getVideoPosition(
-        activeCourse.id,
-        activeLesson.id,
+        course.id,
+        currentLesson.id,
       );
 
     if (
@@ -234,19 +203,22 @@ function LearningPlayer() {
       return;
     }
 
-    const second = Math.floor(
-      video.currentTime,
-    );
+    const second =
+      Math.floor(
+        video.currentTime,
+      );
 
-    setCurrentTime(second);
+    setCurrentTime(
+      second,
+    );
 
     if (
       lastSavedSecond.current !==
       second
     ) {
       learningService.saveVideoPosition(
-        activeCourse.id,
-        activeLesson.id,
+        course.id,
+        currentLesson.id,
         second,
       );
 
@@ -264,16 +236,16 @@ function LearningPlayer() {
     }
 
     learningService.saveVideoPosition(
-      activeCourse.id,
-      activeLesson.id,
+      course.id,
+      currentLesson.id,
       video.currentTime,
     );
   }
 
   function handleEnded() {
     learningService.saveVideoPosition(
-      activeCourse.id,
-      activeLesson.id,
+      course.id,
+      currentLesson.id,
       0,
     );
 
@@ -283,11 +255,16 @@ function LearningPlayer() {
   function handleSpeedChange(
     value: string,
   ) {
-    const rate = Number(value);
+    const rate =
+      Number(value);
 
-    setPlaybackRate(rate);
+    setPlaybackRate(
+      rate,
+    );
 
-    if (videoRef.current) {
+    if (
+      videoRef.current
+    ) {
       videoRef.current.playbackRate =
         rate;
     }
@@ -296,41 +273,48 @@ function LearningPlayer() {
   function handleBookmark() {
     const active =
       learningService.toggleBookmark(
-        activeCourse.id,
-        activeLesson.id,
+        course.id,
+        currentLesson.id,
         currentTime,
       );
 
-    setBookmarked(active);
+    setBookmarked(
+      active,
+    );
 
     setBookmarkTimestamp(
       active
-        ? Math.floor(currentTime)
+        ? Math.floor(
+            currentTime,
+          )
         : null,
     );
   }
 
   function handleSaveNote() {
     learningService.saveNote(
-      activeCourse.id,
-      activeLesson.id,
+      course.id,
+      currentLesson.id,
       note,
       currentTime,
     );
 
     setNoteTimestamp(
-      Math.floor(currentTime),
+      Math.floor(
+        currentTime,
+      ),
     );
   }
 
   function handleComplete() {
     learningService.markCompleted(
-      activeCourse.id,
-      activeLesson.id,
+      course.id,
+      currentLesson.id,
     );
 
     setVersion(
-      (value) => value + 1,
+      (value) =>
+        value + 1,
     );
   }
 
@@ -338,28 +322,31 @@ function LearningPlayer() {
     id: string,
   ) {
     navigate(
-      `/learn/${activeCourse.id}/${id}`,
+      `/learn/${course.id}/${id}`,
     );
   }
 
   function handleNextLesson() {
-    if (nextLesson) {
+    if (
+      nextLesson
+    ) {
       navigate(
-        `/learn/${activeCourse.id}/${nextLesson.id}`,
+        `/learn/${course.id}/${nextLesson.id}`,
       );
     }
   }
 
   return (
-    <section
-      className="learning-page"
-    >
+    <section className="learning-page">
       <div className="learning-top-row">
         <Link
-          to={`/courses/${activeCourse.id}`}
+          to={`/courses/${course.id}`}
           className="back-link"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft
+            size={16}
+          />
+
           Back to course
         </Link>
 
@@ -368,7 +355,10 @@ function LearningPlayer() {
             Course progress
           </span>
 
-          <div className="learning-progress-track">
+          <div
+            className="learning-progress-track"
+            aria-label={`Course progress ${progress}%`}
+          >
             <div
               className="learning-progress-fill"
               style={{
@@ -387,8 +377,9 @@ function LearningPlayer() {
         <div className="learning-main">
           <div className="video-shell">
             <video
-              ref={videoRef}
-              key={activeLesson.id}
+              ref={
+                videoRef
+              }
               className="lesson-video"
               controls
               preload="metadata"
@@ -398,24 +389,31 @@ function LearningPlayer() {
               onTimeUpdate={
                 handleTimeUpdate
               }
-              onPause={handlePause}
-              onEnded={handleEnded}
+              onPause={
+                handlePause
+              }
+              onEnded={
+                handleEnded
+              }
             >
               <source
                 src={
-                  activeLesson.videoUrl
+                  currentLesson.videoUrl
                 }
                 type="video/mp4"
               />
 
-              Your browser does not
-              support video playback.
+              Your browser does
+              not support video
+              playback.
             </video>
           </div>
 
           <div className="lesson-video-tools">
             <div className="video-position-info">
-              <Clock3 size={15} />
+              <Clock3
+                size={15}
+              />
 
               <span>
                 Current position
@@ -434,10 +432,15 @@ function LearningPlayer() {
               </span>
 
               <select
-                value={playbackRate}
-                onChange={(event) =>
+                value={
+                  playbackRate
+                }
+                onChange={(
+                  event,
+                ) =>
                   handleSpeedChange(
-                    event.target.value,
+                    event.target
+                      .value,
                   )
                 }
                 aria-label="Playback speed"
@@ -468,25 +471,38 @@ function LearningPlayer() {
           <div className="lesson-heading-row">
             <div>
               <span className="eyebrow">
-                {activeLesson.module}
+                {
+                  currentLesson.module
+                }
               </span>
 
               <h1>
-                {activeLesson.title}
+                {
+                  currentLesson.title
+                }
               </h1>
 
               <div className="lesson-meta">
                 <span>
-                  <Clock3 size={14} />
+                  <Clock3
+                    size={14}
+                  />
+
                   {
-                    activeLesson.duration
+                    currentLesson.duration
                   }
                 </span>
 
                 <span>
                   Lesson{' '}
-                  {currentIndex + 1}{' '}
-                  of {lessons.length}
+                  {
+                    currentIndex +
+                    1
+                  }{' '}
+                  of{' '}
+                  {
+                    lessons.length
+                  }
                 </span>
               </div>
             </div>
@@ -501,6 +517,9 @@ function LearningPlayer() {
                 }`}
                 onClick={
                   handleBookmark
+                }
+                aria-pressed={
+                  bookmarked
                 }
               >
                 <Bookmark
@@ -563,6 +582,7 @@ function LearningPlayer() {
                 }
               >
                 Next lesson
+
                 <ChevronRight
                   size={17}
                 />
@@ -573,7 +593,9 @@ function LearningPlayer() {
           <section className="lesson-notes-card">
             <div className="lesson-notes-heading">
               <div>
-                <FileText size={19} />
+                <FileText
+                  size={19}
+                />
 
                 <div>
                   <h2>
@@ -581,15 +603,17 @@ function LearningPlayer() {
                   </h2>
 
                   <p>
-                    Save this note at
-                    your current lecture
+                    Save this note
+                    at your current
+                    lecture
                     position.
                   </p>
 
                   {noteTimestamp >
                     0 && (
                     <small className="note-timestamp">
-                      Last saved at{' '}
+                      Last saved
+                      at{' '}
                       {formatTimestamp(
                         noteTimestamp,
                       )}
@@ -604,7 +628,10 @@ function LearningPlayer() {
                   handleSaveNote
                 }
               >
-                <Save size={15} />
+                <Save
+                  size={15}
+                />
+
                 Save at{' '}
                 {formatTimestamp(
                   currentTime,
@@ -613,51 +640,73 @@ function LearningPlayer() {
             </div>
 
             <textarea
-              value={note}
-              onChange={(event) =>
+              value={
+                note
+              }
+              onChange={(
+                event,
+              ) =>
                 setNote(
-                  event.target.value,
+                  event.target
+                    .value,
                 )
               }
               placeholder="Write your notes here..."
+              aria-label="Lesson notes"
             />
           </section>
         </div>
 
-        <aside className="lesson-sidebar">
+        <aside
+          className="lesson-sidebar"
+          aria-label="Course lessons"
+        >
           <div className="lesson-sidebar-header">
             <span className="eyebrow">
               Course content
             </span>
 
             <h2>
-              {activeCourse.title}
+              {
+                course.title
+              }
             </h2>
 
             <p>
-              {completedCount} of{' '}
-              {lessons.length} demo
-              lessons completed
+              {
+                completedCount
+              }{' '}
+              of{' '}
+              {
+                lessons.length
+              }{' '}
+              demo lessons
+              completed
             </p>
           </div>
 
           <div className="lesson-list">
             {lessons.map(
-              (lesson, index) => {
+              (
+                lesson,
+                index,
+              ) => {
                 const active =
                   lesson.id ===
-                  activeLesson.id;
+                  currentLesson.id;
 
                 const completed =
                   learningService.isCompleted(
-                    activeCourse.id,
+                    course.id,
                     lesson.id,
                   );
 
                 return (
                   <button
                     type="button"
-                    key={lesson.id}
+                    key={
+                      lesson.id
+                    }
                     className={`lesson-list-item ${
                       active
                         ? 'active'
@@ -667,6 +716,11 @@ function LearningPlayer() {
                       openLesson(
                         lesson.id,
                       )
+                    }
+                    aria-current={
+                      active
+                        ? 'page'
+                        : undefined
                     }
                   >
                     <div
@@ -690,17 +744,22 @@ function LearningPlayer() {
 
                     <div className="lesson-list-info">
                       <small>
-                        {lesson.module}
+                        {
+                          lesson.module
+                        }
                       </small>
 
                       <strong>
-                        {lesson.title}
+                        {
+                          lesson.title
+                        }
                       </strong>
 
                       <span>
                         <Clock3
                           size={12}
                         />
+
                         {
                           lesson.duration
                         }
@@ -718,6 +777,83 @@ function LearningPlayer() {
         </aside>
       </div>
     </section>
+  );
+}
+
+function LearningPlayer() {
+  const {
+    courseId,
+    lessonId,
+  } = useParams();
+
+  const course =
+    courses.find(
+      (item) =>
+        item.id ===
+        courseId,
+    );
+
+  const lessons =
+    course
+      ? lessonsByCourse[
+          course.id
+        ] ?? []
+      : [];
+
+  const currentLesson =
+    lessons.find(
+      (lesson) =>
+        lesson.id ===
+        lessonId,
+    ) ??
+    lessons[0];
+
+  const currentIndex =
+    lessons.findIndex(
+      (lesson) =>
+        lesson.id ===
+        currentLesson?.id,
+    );
+
+  if (
+    !course ||
+    !currentLesson
+  ) {
+    return (
+      <section className="learning-empty-state">
+        <PlayCircle
+          size={38}
+        />
+
+        <h1>
+          Learning content
+          unavailable
+        </h1>
+
+        <p>
+          This course does not
+          have demo lessons yet.
+        </p>
+
+        <Link to="/courses">
+          Return to courses
+        </Link>
+      </section>
+    );
+  }
+
+  return (
+    <LessonPlayer
+      key={`${course.id}:${currentLesson.id}`}
+      course={course}
+      lessons={lessons}
+      currentLesson={
+        currentLesson
+      }
+      currentIndex={
+        currentIndex
+      }
+    />
   );
 }
 

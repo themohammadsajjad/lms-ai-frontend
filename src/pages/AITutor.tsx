@@ -165,31 +165,42 @@ function formatMode(
   mode: TutorMode,
 ) {
   return (
-    mode.charAt(0).toUpperCase() +
+    mode
+      .charAt(0)
+      .toUpperCase() +
     mode.slice(1)
   );
 }
 
 function AITutor() {
   const initialCourseId =
-    tutorKnowledge[0]?.courseId ??
-    '';
+    tutorKnowledge[0]
+      ?.courseId ?? '';
 
-  const [courseId, setCourseId] =
-    useState(
-      initialCourseId,
+  const [
+    courseId,
+    setCourseId,
+  ] = useState(
+    initialCourseId,
+  );
+
+  const [
+    mode,
+    setMode,
+  ] =
+    useState<TutorMode>(
+      () => {
+        if (
+          !initialCourseId
+        ) {
+          return 'intermediate';
+        }
+
+        return topicMasteryService.getRecommendedDifficulty(
+          initialCourseId,
+        );
+      },
     );
-
-  const [mode, setMode] =
-    useState<TutorMode>(() => {
-      if (!initialCourseId) {
-        return 'intermediate';
-      }
-
-      return topicMasteryService.getRecommendedDifficulty(
-        initialCourseId,
-      );
-    });
 
   const [
     question,
@@ -201,7 +212,17 @@ function AITutor() {
     setMessages,
   ] = useState<
     TutorMessage[]
-  >([]);
+  >(() => {
+    if (
+      !initialCourseId
+    ) {
+      return [];
+    }
+
+    return aiTutorService.getMessages(
+      initialCourseId,
+    );
+  });
 
   const bottomRef =
     useRef<HTMLDivElement | null>(
@@ -226,14 +247,6 @@ function AITutor() {
     );
 
   useEffect(() => {
-    setMessages(
-      aiTutorService.getMessages(
-        courseId,
-      ),
-    );
-  }, [courseId]);
-
-  useEffect(() => {
     bottomRef.current?.scrollIntoView(
       {
         behavior: 'smooth',
@@ -248,6 +261,12 @@ function AITutor() {
 
     setMode(
       topicMasteryService.getRecommendedDifficulty(
+        value,
+      ),
+    );
+
+    setMessages(
+      aiTutorService.getMessages(
         value,
       ),
     );
@@ -359,6 +378,7 @@ function AITutor() {
 
         <div className="ai-status">
           <span />
+
           Course-grounded demo
         </div>
       </div>
@@ -573,31 +593,33 @@ function AITutor() {
             </label>
 
             <div className="ai-suggestions">
-              {activeKnowledge?.suggestions.map(
-                (
-                  suggestion,
-                ) => (
-                  <button
-                    type="button"
-                    key={
-                      suggestion
-                    }
-                    onClick={() =>
-                      sendQuestion(
-                        suggestion,
-                      )
-                    }
-                  >
-                    <Sparkles
-                      size={13}
-                    />
+              {activeKnowledge
+                ?.suggestions
+                .map(
+                  (
+                    suggestion,
+                  ) => (
+                    <button
+                      type="button"
+                      key={
+                        suggestion
+                      }
+                      onClick={() =>
+                        sendQuestion(
+                          suggestion,
+                        )
+                      }
+                    >
+                      <Sparkles
+                        size={13}
+                      />
 
-                    {
-                      suggestion
-                    }
-                  </button>
-                ),
-              )}
+                      {
+                        suggestion
+                      }
+                    </button>
+                  ),
+                )}
             </div>
           </div>
 
@@ -632,7 +654,8 @@ function AITutor() {
               <section>
                 <strong>
                   {
-                    activeKnowledge?.courseTitle
+                    activeKnowledge
+                      ?.courseTitle
                   }
                 </strong>
 
@@ -676,7 +699,8 @@ function AITutor() {
                   about{' '}
                   <strong>
                     {
-                      activeKnowledge?.courseTitle
+                      activeKnowledge
+                        ?.courseTitle
                     }
                   </strong>{' '}
                   or choose one
@@ -686,7 +710,8 @@ function AITutor() {
                 </p>
 
                 <div className="ai-empty-suggestions">
-                  {activeKnowledge?.suggestions
+                  {activeKnowledge
+                    ?.suggestions
                     .slice(
                       0,
                       2,
@@ -729,15 +754,11 @@ function AITutor() {
                       {message.role ===
                       'assistant' ? (
                         <Bot
-                          size={
-                            17
-                          }
+                          size={17}
                         />
                       ) : (
                         <UserRound
-                          size={
-                            17
-                          }
+                          size={17}
                         />
                       )}
                     </div>
@@ -778,9 +799,7 @@ function AITutor() {
                                     }
                                   >
                                     <BookOpen
-                                      size={
-                                        12
-                                      }
+                                      size={12}
                                     />
 
                                     <section>
@@ -835,7 +854,8 @@ function AITutor() {
                   )
                 }
                 placeholder={`Ask about ${
-                  activeKnowledge?.courseTitle ??
+                  activeKnowledge
+                    ?.courseTitle ??
                   'your course'
                 }...`}
                 rows={1}
