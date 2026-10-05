@@ -13899,3 +13899,114 @@ html[data-theme='dark']
     flex-direction: column;
   }
 }
+
+/* ==============================
+   Module Flashcard Controls
+   ============================== */
+
+.flashcard-module-tools {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.flashcard-module-select {
+  display: grid;
+  gap: 5px;
+}
+
+.flashcard-module-select > span {
+  color: #8d92a3;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.flashcard-module-select > div {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 210px;
+}
+
+.flashcard-module-select select {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 34px 0 10px;
+  color: #373d50;
+  border: 1px solid #dfe1e9;
+  border-radius: 9px;
+  outline: none;
+  appearance: none;
+  background: #fff;
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.flashcard-module-select select:focus {
+  border-color: #a9a1ee;
+  box-shadow: 0 0 0 3px rgba(101, 88, 216, 0.1);
+}
+
+.flashcard-module-select > div > svg {
+  position: absolute;
+  right: 10px;
+  color: #858b9c;
+  pointer-events: none;
+}
+
+.flashcard-module-tools .flashcard-count {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid #e1e3ea;
+  border-radius: 9px;
+  background: #fafafe;
+  font-weight: 800;
+}
+
+/* Dark mode */
+
+html[data-theme='dark']
+  .flashcard-module-select select {
+  color: #e0e2ea;
+  border-color: #34394a;
+  background: #202534;
+}
+
+html[data-theme='dark']
+  .flashcard-module-tools
+  .flashcard-count {
+  color: #c1c5d1;
+  border-color: #34394a;
+  background: #202534;
+}
+
+/* Responsive */
+
+@media (max-width: 700px) {
+  .flashcard-section
+    .section-heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .flashcard-module-tools {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .flashcard-module-select > div {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .flashcard-module-tools
+    .flashcard-count {
+    width: fit-content;
+  }
+}

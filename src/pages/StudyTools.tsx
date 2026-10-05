@@ -26,6 +26,10 @@ import { topicMasteryService } from '../services/topicMasteryService';
 const initialCourseId =
   studyResources[0]?.courseId ?? '';
 
+const initialModuleTitle =
+  studyResources[0]?.flashcards[0]
+    ?.moduleTitle ?? '';
+
 function StudyTools() {
   const [courseId, setCourseId] =
     useState(initialCourseId);
@@ -40,19 +44,25 @@ function StudyTools() {
   );
 
   const [
+    selectedModuleTitle,
+    setSelectedModuleTitle,
+  ] = useState(
+    initialModuleTitle,
+  );
+
+  const [
     generatedSummaryLessonId,
     setGeneratedSummaryLessonId,
-  ] = useState<string | null>(
-    null,
-  );
+  ] = useState<
+    string | null
+  >(null);
 
   const [
     flippedCardId,
     setFlippedCardId,
-  ] =
-    useState<string | null>(
-      null,
-    );
+  ] = useState<
+    string | null
+  >(null);
 
   const [, setVersion] =
     useState(0);
@@ -77,8 +87,8 @@ function StudyTools() {
 
         <p>
           No study resources are
-          available for this course
-          yet.
+          available for this
+          course yet.
         </p>
       </section>
     );
@@ -113,8 +123,32 @@ function StudyTools() {
       ? selectedTranscript.keyPoints
       : null;
 
+  const moduleTitles =
+    Array.from(
+      new Set(
+        activeResource.flashcards.map(
+          (card) =>
+            card.moduleTitle,
+        ),
+      ),
+    );
+
+  const activeModuleTitle =
+    moduleTitles.includes(
+      selectedModuleTitle,
+    )
+      ? selectedModuleTitle
+      : moduleTitles[0] ?? '';
+
+  const moduleFlashcards =
+    activeResource.flashcards.filter(
+      (card) =>
+        card.moduleTitle ===
+        activeModuleTitle,
+    );
+
   const cardIds =
-    activeResource.flashcards.map(
+    moduleFlashcards.map(
       (card) =>
         card.id,
     );
@@ -279,14 +313,30 @@ function StudyTools() {
   ) {
     setCourseId(value);
 
+    const nextResource =
+      studyResources.find(
+        (item) =>
+          item.courseId ===
+          value,
+      );
+
     const firstLesson =
       lessonsByCourse[
         value
       ]?.[0];
 
+    const firstModule =
+      nextResource
+        ?.flashcards[0]
+        ?.moduleTitle ?? '';
+
     setSelectedLessonId(
       firstLesson?.id ??
         '',
+    );
+
+    setSelectedModuleTitle(
+      firstModule,
     );
 
     setGeneratedSummaryLessonId(
@@ -306,6 +356,18 @@ function StudyTools() {
     );
 
     setGeneratedSummaryLessonId(
+      null,
+    );
+  }
+
+  function handleModuleChange(
+    value: string,
+  ) {
+    setSelectedModuleTitle(
+      value,
+    );
+
+    setFlippedCardId(
       null,
     );
   }
@@ -362,9 +424,10 @@ function StudyTools() {
           <p>
             Summarize selected
             lectures, practice
-            with flashcards and
-            follow recommendations
-            based on your quiz
+            module-specific
+            flashcards and follow
+            recommendations based
+            on your quiz
             performance and topic
             mastery.
           </p>
@@ -472,24 +535,28 @@ function StudyTools() {
 
           <div>
             <span className="eyebrow">
-              Flashcard progress
+              Module flashcard
+              progress
             </span>
 
             <h2>
               {masteredCount}{' '}
               of{' '}
               {
-                activeResource
-                  .flashcards
-                  .length
+                moduleFlashcards.length
               }{' '}
               mastered
             </h2>
 
             <p>
-              Mark cards as
-              mastered once you
-              are confident you
+              Progress for{' '}
+              <strong>
+                {
+                  activeModuleTitle
+                }
+              </strong>
+              . Mark cards as
+              mastered when you
               can recall the
               answer without
               help.
@@ -525,9 +592,10 @@ function StudyTools() {
             </h2>
 
             <p>
-              Choose a lecture and
-              generate key points from
-              its course transcript.
+              Choose a lecture
+              and generate key
+              points from its
+              course transcript.
             </p>
           </div>
         </div>
@@ -578,7 +646,8 @@ function StudyTools() {
                   )
                 ) : (
                   <option value="">
-                    No lectures available
+                    No lectures
+                    available
                   </option>
                 )}
               </select>
@@ -779,8 +848,9 @@ function StudyTools() {
             Your topic-level
             mastery is calculated
             from course progress
-            signals and your latest
-            quiz performance.
+            signals and your
+            latest quiz
+            performance.
           </p>
         </div>
 
@@ -804,137 +874,207 @@ function StudyTools() {
         <div className="section-heading">
           <div>
             <h2>
-              Flashcards
+              Module Flashcards
             </h2>
 
             <p>
-              Click a card to
-              reveal the answer.
+              Practice AI study
+              cards for one
+              module at a time.
             </p>
           </div>
 
-          <span className="flashcard-count">
-            {
-              activeResource
-                .flashcards
-                .length
-            }{' '}
-            cards
-          </span>
-        </div>
+          <div className="flashcard-module-tools">
+            <label className="flashcard-module-select">
+              <span>
+                Module
+              </span>
 
-        <div className="flashcard-grid">
-          {activeResource.flashcards.map(
-            (
-              card,
-              index,
-            ) => {
-              const flipped =
-                flippedCardId ===
-                card.id;
-
-              const mastered =
-                studyToolsService.isMastered(
-                  card.id,
-                );
-
-              return (
-                <article
-                  className={`flashcard ${
-                    flipped
-                      ? 'flipped'
-                      : ''
-                  } ${
-                    mastered
-                      ? 'mastered'
-                      : ''
-                  }`}
-                  key={
-                    card.id
+              <div>
+                <select
+                  value={
+                    activeModuleTitle
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    handleModuleChange(
+                      event.target
+                        .value,
+                    )
+                  }
+                  disabled={
+                    moduleTitles.length ===
+                    0
                   }
                 >
-                  <button
-                    type="button"
-                    className="flashcard-main"
-                    onClick={() =>
-                      setFlippedCardId(
-                        flipped
-                          ? null
-                          : card.id,
-                      )
-                    }
-                  >
-                    <div className="flashcard-top">
-                      <span>
-                        Card{' '}
-                        {index +
-                          1}
-                      </span>
+                  {moduleTitles.map(
+                    (
+                      moduleTitle,
+                    ) => (
+                      <option
+                        key={
+                          moduleTitle
+                        }
+                        value={
+                          moduleTitle
+                        }
+                      >
+                        {
+                          moduleTitle
+                        }
+                      </option>
+                    ),
+                  )}
+                </select>
 
-                      {mastered && (
-                        <span className="mastered-badge">
-                          <CheckCircle2
-                            size={
-                              13
-                            }
-                          />
+                <ChevronDown
+                  size={14}
+                />
+              </div>
+            </label>
 
-                          Mastered
-                        </span>
-                      )}
-                    </div>
+            <span className="flashcard-count">
+              {
+                moduleFlashcards.length
+              }{' '}
+              cards
+            </span>
+          </div>
+        </div>
 
-                    <div className="flashcard-content">
-                      <small>
-                        {flipped
-                          ? 'Answer'
-                          : 'Question'}
-                      </small>
+        {moduleFlashcards.length >
+        0 ? (
+          <div className="flashcard-grid">
+            {moduleFlashcards.map(
+              (
+                card,
+                index,
+              ) => {
+                const flipped =
+                  flippedCardId ===
+                  card.id;
 
-                      <h3>
-                        {flipped
-                          ? card.back
-                          : card.front}
-                      </h3>
-                    </div>
+                const mastered =
+                  studyToolsService.isMastered(
+                    card.id,
+                  );
 
-                    <div className="flashcard-flip-hint">
-                      <RotateCcw
-                        size={14}
-                      />
-
-                      {flipped
-                        ? 'Show question'
-                        : 'Reveal answer'}
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`master-card-button ${
+                return (
+                  <article
+                    className={`flashcard ${
+                      flipped
+                        ? 'flipped'
+                        : ''
+                    } ${
                       mastered
-                        ? 'active'
+                        ? 'mastered'
                         : ''
                     }`}
-                    onClick={() =>
-                      handleMastered(
-                        card.id,
-                      )
+                    key={
+                      card.id
                     }
                   >
-                    <CheckCircle2
-                      size={15}
-                    />
+                    <button
+                      type="button"
+                      className="flashcard-main"
+                      onClick={() =>
+                        setFlippedCardId(
+                          flipped
+                            ? null
+                            : card.id,
+                        )
+                      }
+                    >
+                      <div className="flashcard-top">
+                        <span>
+                          Card{' '}
+                          {index +
+                            1}
+                        </span>
 
-                    {mastered
-                      ? 'Marked as mastered'
-                      : 'Mark as mastered'}
-                  </button>
-                </article>
-              );
-            },
-          )}
-        </div>
+                        {mastered && (
+                          <span className="mastered-badge">
+                            <CheckCircle2
+                              size={
+                                13
+                              }
+                            />
+
+                            Mastered
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flashcard-content">
+                        <small>
+                          {flipped
+                            ? 'Answer'
+                            : 'Question'}
+                        </small>
+
+                        <h3>
+                          {flipped
+                            ? card.back
+                            : card.front}
+                        </h3>
+                      </div>
+
+                      <div className="flashcard-flip-hint">
+                        <RotateCcw
+                          size={14}
+                        />
+
+                        {flipped
+                          ? 'Show question'
+                          : 'Reveal answer'}
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`master-card-button ${
+                        mastered
+                          ? 'active'
+                          : ''
+                      }`}
+                      onClick={() =>
+                        handleMastered(
+                          card.id,
+                        )
+                      }
+                    >
+                      <CheckCircle2
+                        size={15}
+                      />
+
+                      {mastered
+                        ? 'Marked as mastered'
+                        : 'Mark as mastered'}
+                    </button>
+                  </article>
+                );
+              },
+            )}
+          </div>
+        ) : (
+          <div className="catalog-empty">
+            <BrainCircuit
+              size={28}
+            />
+
+            <h3>
+              No flashcards
+              available
+            </h3>
+
+            <p>
+              This module does
+              not have generated
+              flashcards yet.
+            </p>
+          </div>
+        )}
       </section>
 
       <div className="study-bottom-grid">
