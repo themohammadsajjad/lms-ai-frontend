@@ -1,6 +1,7 @@
 import {
   courseApprovals,
   platformUsers,
+  type AdminUserRole,
   type AdminUserStatus,
   type CourseApproval,
   type CourseApprovalStatus,
@@ -8,10 +9,14 @@ import {
 } from '../data/adminData';
 
 const USERS_KEY = 'lms_admin_users';
-const APPROVALS_KEY = 'lms_admin_course_approvals';
+const APPROVALS_KEY =
+  'lms_admin_course_approvals';
 
 function readUsers(): PlatformUser[] {
-  const stored = localStorage.getItem(USERS_KEY);
+  const stored =
+    localStorage.getItem(
+      USERS_KEY,
+    );
 
   if (!stored) {
     localStorage.setItem(
@@ -23,7 +28,9 @@ function readUsers(): PlatformUser[] {
   }
 
   try {
-    return JSON.parse(stored) as PlatformUser[];
+    return JSON.parse(
+      stored,
+    ) as PlatformUser[];
   } catch {
     localStorage.setItem(
       USERS_KEY,
@@ -34,7 +41,9 @@ function readUsers(): PlatformUser[] {
   }
 }
 
-function saveUsers(users: PlatformUser[]) {
+function saveUsers(
+  users: PlatformUser[],
+) {
   localStorage.setItem(
     USERS_KEY,
     JSON.stringify(users),
@@ -42,30 +51,41 @@ function saveUsers(users: PlatformUser[]) {
 }
 
 function readApprovals(): CourseApproval[] {
-  const stored = localStorage.getItem(APPROVALS_KEY);
+  const stored =
+    localStorage.getItem(
+      APPROVALS_KEY,
+    );
 
   if (!stored) {
     localStorage.setItem(
       APPROVALS_KEY,
-      JSON.stringify(courseApprovals),
+      JSON.stringify(
+        courseApprovals,
+      ),
     );
 
     return courseApprovals;
   }
 
   try {
-    return JSON.parse(stored) as CourseApproval[];
+    return JSON.parse(
+      stored,
+    ) as CourseApproval[];
   } catch {
     localStorage.setItem(
       APPROVALS_KEY,
-      JSON.stringify(courseApprovals),
+      JSON.stringify(
+        courseApprovals,
+      ),
     );
 
     return courseApprovals;
   }
 }
 
-function saveApprovals(approvals: CourseApproval[]) {
+function saveApprovals(
+  approvals: CourseApproval[],
+) {
   localStorage.setItem(
     APPROVALS_KEY,
     JSON.stringify(approvals),
@@ -81,23 +101,68 @@ export const adminService = {
     userId: string,
     status: AdminUserStatus,
   ): PlatformUser[] {
-    const updated = readUsers().map((user) => {
-      if (user.id !== userId) {
-        return user;
-      }
+    const updated =
+      readUsers().map(
+        (user) => {
+          if (
+            user.id !== userId
+          ) {
+            return user;
+          }
 
-      return {
-        ...user,
-        status,
-      };
-    });
+          return {
+            ...user,
+            status,
+          };
+        },
+      );
 
     saveUsers(updated);
 
     return updated;
   },
 
-  getCourseApprovals(): CourseApproval[] {
+  updateUserRole(
+    userId: string,
+    role: AdminUserRole,
+  ): PlatformUser[] {
+    const updated =
+      readUsers().map(
+        (user) => {
+          if (
+            user.id !== userId
+          ) {
+            return user;
+          }
+
+          return {
+            ...user,
+            role,
+          };
+        },
+      );
+
+    saveUsers(updated);
+
+    return updated;
+  },
+
+  deleteUser(
+    userId: string,
+  ): PlatformUser[] {
+    const updated =
+      readUsers().filter(
+        (user) =>
+          user.id !== userId,
+      );
+
+    saveUsers(updated);
+
+    return updated;
+  },
+
+  getCourseApprovals():
+    CourseApproval[] {
     return readApprovals();
   },
 
@@ -105,16 +170,22 @@ export const adminService = {
     courseId: string,
     status: CourseApprovalStatus,
   ): CourseApproval[] {
-    const updated = readApprovals().map((course) => {
-      if (course.id !== courseId) {
-        return course;
-      }
+    const updated =
+      readApprovals().map(
+        (course) => {
+          if (
+            course.id !==
+            courseId
+          ) {
+            return course;
+          }
 
-      return {
-        ...course,
-        status,
-      };
-    });
+          return {
+            ...course,
+            status,
+          };
+        },
+      );
 
     saveApprovals(updated);
 
@@ -123,25 +194,32 @@ export const adminService = {
 
   getActiveUserCount(): number {
     return readUsers().filter(
-      (user) => user.status === 'active',
+      (user) =>
+        user.status === 'active',
     ).length;
   },
 
   getInstructorCount(): number {
     return readUsers().filter(
-      (user) => user.role === 'instructor',
+      (user) =>
+        user.role ===
+        'instructor',
     ).length;
   },
 
   getPendingApprovalCount(): number {
     return readApprovals().filter(
-      (course) => course.status === 'pending',
+      (course) =>
+        course.status ===
+        'pending',
     ).length;
   },
 
   getApprovedCourseCount(): number {
     return readApprovals().filter(
-      (course) => course.status === 'approved',
+      (course) =>
+        course.status ===
+        'approved',
     ).length;
   },
 };

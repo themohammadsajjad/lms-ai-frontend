@@ -7,68 +7,106 @@ import {
   GraduationCap,
   Search,
   ShieldCheck,
+  Trash2,
   UserCheck,
   Users,
   UserX,
   XCircle,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { platformActivity } from '../data/adminData';
+import {
+  platformActivity,
+  type AdminUserRole,
+} from '../data/adminData';
 import { adminService } from '../services/adminService';
 
-type AdminTab = 'overview' | 'approvals' | 'users';
+type AdminTab =
+  | 'overview'
+  | 'approvals'
+  | 'users';
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] =
     useState<AdminTab>('overview');
 
-  const [users, setUsers] = useState(() =>
-    adminService.getUsers(),
-  );
+  const [users, setUsers] =
+    useState(() =>
+      adminService.getUsers(),
+    );
 
-  const [approvals, setApprovals] = useState(() =>
-    adminService.getCourseApprovals(),
-  );
+  const [approvals, setApprovals] =
+    useState(() =>
+      adminService.getCourseApprovals(),
+    );
 
-  const [userSearch, setUserSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
+  const [userSearch, setUserSearch] =
+    useState('');
+
+  const [roleFilter, setRoleFilter] =
+    useState('all');
 
   const activeUsers = users.filter(
-    (user) => user.status === 'active',
+    (user) =>
+      user.status === 'active',
   ).length;
 
   const instructorCount = users.filter(
-    (user) => user.role === 'instructor',
+    (user) =>
+      user.role === 'instructor',
   ).length;
 
-  const pendingApprovals = approvals.filter(
-    (course) => course.status === 'pending',
-  ).length;
+  const pendingApprovals =
+    approvals.filter(
+      (course) =>
+        course.status === 'pending',
+    ).length;
 
-  const approvedCourses = approvals.filter(
-    (course) => course.status === 'approved',
-  ).length;
+  const approvedCourses =
+    approvals.filter(
+      (course) =>
+        course.status === 'approved',
+    ).length;
 
-  const filteredUsers = useMemo(() => {
-    const query = userSearch.trim().toLowerCase();
+  const filteredUsers =
+    useMemo(() => {
+      const query =
+        userSearch
+          .trim()
+          .toLowerCase();
 
-    return users.filter((user) => {
-      const matchesSearch =
-        !query ||
-        user.name.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query);
+      return users.filter(
+        (user) => {
+          const matchesSearch =
+            !query ||
+            user.name
+              .toLowerCase()
+              .includes(query) ||
+            user.email
+              .toLowerCase()
+              .includes(query);
 
-      const matchesRole =
-        roleFilter === 'all' ||
-        user.role === roleFilter;
+          const matchesRole =
+            roleFilter === 'all' ||
+            user.role ===
+              roleFilter;
 
-      return matchesSearch && matchesRole;
-    });
-  }, [users, userSearch, roleFilter]);
+          return (
+            matchesSearch &&
+            matchesRole
+          );
+        },
+      );
+    }, [
+      users,
+      userSearch,
+      roleFilter,
+    ]);
 
   function handleApproval(
     courseId: string,
-    status: 'approved' | 'rejected',
+    status:
+      | 'approved'
+      | 'rejected',
   ) {
     setApprovals(
       adminService.updateCourseApproval(
@@ -80,10 +118,47 @@ function AdminDashboard() {
 
   function handleUserStatus(
     userId: string,
-    status: 'active' | 'suspended',
+    status:
+      | 'active'
+      | 'suspended',
   ) {
     setUsers(
-      adminService.updateUserStatus(userId, status),
+      adminService.updateUserStatus(
+        userId,
+        status,
+      ),
+    );
+  }
+
+  function handleUserRole(
+    userId: string,
+    role: AdminUserRole,
+  ) {
+    setUsers(
+      adminService.updateUserRole(
+        userId,
+        role,
+      ),
+    );
+  }
+
+  function handleDeleteUser(
+    userId: string,
+    userName: string,
+  ) {
+    const confirmed =
+      window.confirm(
+        `Delete ${userName}'s account? This action cannot be undone in this frontend demo.`,
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setUsers(
+      adminService.deleteUser(
+        userId,
+      ),
     );
   }
 
@@ -95,10 +170,13 @@ function AdminDashboard() {
             Administration workspace
           </span>
 
-          <h1>Platform overview</h1>
+          <h1>
+            Platform overview
+          </h1>
 
           <p>
-            Manage users, review course submissions and
+            Manage users, review
+            course submissions and
             monitor platform activity.
           </p>
         </div>
@@ -116,21 +194,40 @@ function AdminDashboard() {
           </div>
 
           <div>
-            <span>Managed users</span>
-            <strong>{users.length}</strong>
-            <small>{activeUsers} active accounts</small>
+            <span>
+              Managed users
+            </span>
+
+            <strong>
+              {users.length}
+            </strong>
+
+            <small>
+              {activeUsers} active
+              accounts
+            </small>
           </div>
         </article>
 
         <article>
           <div className="admin-stat-icon blue">
-            <GraduationCap size={20} />
+            <GraduationCap
+              size={20}
+            />
           </div>
 
           <div>
-            <span>Instructors</span>
-            <strong>{instructorCount}</strong>
-            <small>Teaching accounts</small>
+            <span>
+              Instructors
+            </span>
+
+            <strong>
+              {instructorCount}
+            </strong>
+
+            <small>
+              Teaching accounts
+            </small>
           </div>
         </article>
 
@@ -140,21 +237,39 @@ function AdminDashboard() {
           </div>
 
           <div>
-            <span>Pending approvals</span>
-            <strong>{pendingApprovals}</strong>
-            <small>Courses awaiting review</small>
+            <span>
+              Pending approvals
+            </span>
+
+            <strong>
+              {pendingApprovals}
+            </strong>
+
+            <small>
+              Courses awaiting review
+            </small>
           </div>
         </article>
 
         <article>
           <div className="admin-stat-icon green">
-            <BookCheck size={20} />
+            <BookCheck
+              size={20}
+            />
           </div>
 
           <div>
-            <span>Approved courses</span>
-            <strong>{approvedCourses}</strong>
-            <small>Reviewed submissions</small>
+            <span>
+              Approved courses
+            </span>
+
+            <strong>
+              {approvedCourses}
+            </strong>
+
+            <small>
+              Reviewed submissions
+            </small>
           </div>
         </article>
       </div>
@@ -163,9 +278,13 @@ function AdminDashboard() {
         <button
           type="button"
           className={
-            activeTab === 'overview' ? 'active' : ''
+            activeTab === 'overview'
+              ? 'active'
+              : ''
           }
-          onClick={() => setActiveTab('overview')}
+          onClick={() =>
+            setActiveTab('overview')
+          }
         >
           Overview
         </button>
@@ -173,53 +292,81 @@ function AdminDashboard() {
         <button
           type="button"
           className={
-            activeTab === 'approvals' ? 'active' : ''
+            activeTab ===
+            'approvals'
+              ? 'active'
+              : ''
           }
-          onClick={() => setActiveTab('approvals')}
+          onClick={() =>
+            setActiveTab(
+              'approvals',
+            )
+          }
         >
           Course approvals
 
-          {pendingApprovals > 0 && (
-            <span>{pendingApprovals}</span>
+          {pendingApprovals >
+            0 && (
+            <span>
+              {pendingApprovals}
+            </span>
           )}
         </button>
 
         <button
           type="button"
           className={
-            activeTab === 'users' ? 'active' : ''
+            activeTab === 'users'
+              ? 'active'
+              : ''
           }
-          onClick={() => setActiveTab('users')}
+          onClick={() =>
+            setActiveTab('users')
+          }
         >
           Users
         </button>
       </div>
 
-      {activeTab === 'overview' && (
+      {activeTab ===
+        'overview' && (
         <div className="admin-overview-grid">
           <section className="admin-panel admin-governance-panel">
             <div className="admin-panel-heading">
               <div>
-                <span>Governance</span>
-                <h2>Platform controls</h2>
+                <span>
+                  Governance
+                </span>
+
+                <h2>
+                  Platform controls
+                </h2>
+
                 <p>
-                  Key administrative areas requiring
+                  Key administrative
+                  areas requiring
                   regular review.
                 </p>
               </div>
 
-              <ShieldCheck size={20} />
+              <ShieldCheck
+                size={20}
+              />
             </div>
 
             <div className="admin-governance-grid">
               <button
                 type="button"
                 onClick={() =>
-                  setActiveTab('approvals')
+                  setActiveTab(
+                    'approvals',
+                  )
                 }
               >
                 <div className="governance-icon orange">
-                  <BookOpen size={19} />
+                  <BookOpen
+                    size={19}
+                  />
                 </div>
 
                 <section>
@@ -228,41 +375,62 @@ function AdminDashboard() {
                   </strong>
 
                   <span>
-                    {pendingApprovals} submissions
-                    waiting
+                    {pendingApprovals}{' '}
+                    submissions waiting
                   </span>
                 </section>
 
-                <small>Review</small>
+                <small>
+                  Review
+                </small>
               </button>
 
               <button
                 type="button"
-                onClick={() => setActiveTab('users')}
+                onClick={() =>
+                  setActiveTab(
+                    'users',
+                  )
+                }
               >
                 <div className="governance-icon blue">
-                  <Users size={19} />
+                  <Users
+                    size={19}
+                  />
                 </div>
 
                 <section>
-                  <strong>User management</strong>
+                  <strong>
+                    User management
+                  </strong>
 
                   <span>
-                    {users.length} accounts available
+                    {users.length}{' '}
+                    accounts available
                   </span>
                 </section>
 
-                <small>Manage</small>
+                <small>
+                  Manage
+                </small>
               </button>
 
               <article>
                 <div className="governance-icon green">
-                  <Activity size={19} />
+                  <Activity
+                    size={19}
+                  />
                 </div>
 
                 <section>
-                  <strong>System status</strong>
-                  <span>Core services operating normally</span>
+                  <strong>
+                    System status
+                  </strong>
+
+                  <span>
+                    Core services
+                    operating normally
+                  </span>
                 </section>
 
                 <small className="healthy-text">
@@ -275,37 +443,62 @@ function AdminDashboard() {
           <aside className="admin-panel admin-health-panel">
             <div className="admin-panel-heading">
               <div>
-                <span>System health</span>
-                <h2>Service status</h2>
+                <span>
+                  System health
+                </span>
+
+                <h2>
+                  Service status
+                </h2>
               </div>
             </div>
 
             <div className="health-score">
               <div>
-                <ShieldCheck size={28} />
+                <ShieldCheck
+                  size={28}
+                />
               </div>
 
-              <strong>Healthy</strong>
+              <strong>
+                Healthy
+              </strong>
 
               <span>
-                All core learning services are online.
+                All core learning
+                services are online.
               </span>
             </div>
 
             <div className="health-metrics">
               <div>
-                <span>API status</span>
-                <strong>Operational</strong>
+                <span>
+                  API status
+                </span>
+
+                <strong>
+                  Operational
+                </strong>
               </div>
 
               <div>
-                <span>Course delivery</span>
-                <strong>Operational</strong>
+                <span>
+                  Course delivery
+                </span>
+
+                <strong>
+                  Operational
+                </strong>
               </div>
 
               <div>
-                <span>Authentication</span>
-                <strong>Operational</strong>
+                <span>
+                  Authentication
+                </span>
+
+                <strong>
+                  Operational
+                </strong>
               </div>
             </div>
           </aside>
@@ -313,61 +506,103 @@ function AdminDashboard() {
           <section className="admin-panel admin-activity-panel">
             <div className="admin-panel-heading">
               <div>
-                <span>Recent activity</span>
-                <h2>Platform events</h2>
+                <span>
+                  Recent activity
+                </span>
+
+                <h2>
+                  Platform events
+                </h2>
+
                 <p>
-                  Latest administrative and learning
-                  events.
+                  Latest administrative
+                  and learning events.
                 </p>
               </div>
             </div>
 
             <div className="admin-activity-list">
-              {platformActivity.map((activity) => (
-                <article key={activity.id}>
-                  <div
-                    className={`activity-type-icon ${activity.type}`}
+              {platformActivity.map(
+                (activity) => (
+                  <article
+                    key={
+                      activity.id
+                    }
                   >
-                    {activity.type === 'user' && (
-                      <Users size={16} />
-                    )}
+                    <div
+                      className={`activity-type-icon ${activity.type}`}
+                    >
+                      {activity.type ===
+                        'user' && (
+                        <Users
+                          size={
+                            16
+                          }
+                        />
+                      )}
 
-                    {activity.type === 'course' && (
-                      <BookOpen size={16} />
-                    )}
+                      {activity.type ===
+                        'course' && (
+                        <BookOpen
+                          size={
+                            16
+                          }
+                        />
+                      )}
 
-                    {activity.type === 'system' && (
-                      <Activity size={16} />
-                    )}
-                  </div>
+                      {activity.type ===
+                        'system' && (
+                        <Activity
+                          size={
+                            16
+                          }
+                        />
+                      )}
+                    </div>
 
-                  <div>
-                    <strong>
-                      {activity.title}
-                    </strong>
+                    <div>
+                      <strong>
+                        {
+                          activity.title
+                        }
+                      </strong>
 
-                    <span>
-                      {activity.description}
-                    </span>
-                  </div>
+                      <span>
+                        {
+                          activity.description
+                        }
+                      </span>
+                    </div>
 
-                  <small>{activity.time}</small>
-                </article>
-              ))}
+                    <small>
+                      {
+                        activity.time
+                      }
+                    </small>
+                  </article>
+                ),
+              )}
             </div>
           </section>
 
           <section className="admin-panel admin-approval-preview">
             <div className="admin-panel-heading">
               <div>
-                <span>Moderation queue</span>
-                <h2>Pending courses</h2>
+                <span>
+                  Moderation queue
+                </span>
+
+                <h2>
+                  Pending courses
+                </h2>
               </div>
 
               <button
                 type="button"
                 onClick={() =>
-                  setActiveTab('approvals')
+                  setActiveTab(
+                    'approvals',
+                  )
                 }
               >
                 View all
@@ -378,38 +613,65 @@ function AdminDashboard() {
               {approvals
                 .filter(
                   (course) =>
-                    course.status === 'pending',
+                    course.status ===
+                    'pending',
                 )
                 .slice(0, 3)
-                .map((course) => (
-                  <article key={course.id}>
-                    <div>
-                      <BookOpen size={17} />
-                    </div>
+                .map(
+                  (course) => (
+                    <article
+                      key={
+                        course.id
+                      }
+                    >
+                      <div>
+                        <BookOpen
+                          size={
+                            17
+                          }
+                        />
+                      </div>
 
-                    <section>
-                      <strong>{course.title}</strong>
+                      <section>
+                        <strong>
+                          {
+                            course.title
+                          }
+                        </strong>
 
-                      <span>
-                        By {course.instructor}
-                      </span>
-                    </section>
+                        <span>
+                          By{' '}
+                          {
+                            course.instructor
+                          }
+                        </span>
+                      </section>
 
-                    <small>
-                      {course.lessons} lessons
-                    </small>
-                  </article>
-                ))}
+                      <small>
+                        {
+                          course.lessons
+                        }{' '}
+                        lessons
+                      </small>
+                    </article>
+                  ),
+                )}
 
-              {pendingApprovals === 0 && (
+              {pendingApprovals ===
+                0 && (
                 <div className="admin-empty-state">
-                  <CheckCircle2 size={24} />
+                  <CheckCircle2
+                    size={24}
+                  />
 
-                  <strong>Queue is clear</strong>
+                  <strong>
+                    Queue is clear
+                  </strong>
 
                   <span>
-                    There are no courses waiting for
-                    review.
+                    There are no
+                    courses waiting
+                    for review.
                   </span>
                 </div>
               )}
@@ -418,7 +680,8 @@ function AdminDashboard() {
         </div>
       )}
 
-      {activeTab === 'approvals' && (
+      {activeTab ===
+        'approvals' && (
         <section className="admin-management-section">
           <div className="admin-section-heading">
             <div>
@@ -426,101 +689,149 @@ function AdminDashboard() {
                 Course governance
               </span>
 
-              <h2>Course approvals</h2>
+              <h2>
+                Course approvals
+              </h2>
 
               <p>
-                Review instructor submissions before
-                publishing them to learners.
+                Review instructor
+                submissions before
+                publishing them to
+                learners.
               </p>
             </div>
 
             <div className="admin-summary-box">
-              <strong>{pendingApprovals}</strong>
-              <span>Pending</span>
+              <strong>
+                {pendingApprovals}
+              </strong>
+
+              <span>
+                Pending
+              </span>
             </div>
           </div>
 
           <div className="admin-approval-list">
-            {approvals.map((course) => (
-              <article
-                className="admin-approval-card"
-                key={course.id}
-              >
-                <div className="admin-course-icon">
-                  <BookOpen size={21} />
-                </div>
-
-                <div className="admin-course-main">
-                  <span>{course.category}</span>
-
-                  <h3>{course.title}</h3>
-
-                  <p>
-                    Submitted by{' '}
-                    <strong>
-                      {course.instructor}
-                    </strong>{' '}
-                    · {course.lessons} lessons ·{' '}
-                    {course.submittedAt}
-                  </p>
-                </div>
-
-                <div
-                  className={`admin-approval-status ${course.status}`}
+            {approvals.map(
+              (course) => (
+                <article
+                  className="admin-approval-card"
+                  key={course.id}
                 >
-                  {course.status === 'pending' && (
-                    <Clock3 size={13} />
-                  )}
-
-                  {course.status === 'approved' && (
-                    <CheckCircle2 size={13} />
-                  )}
-
-                  {course.status === 'rejected' && (
-                    <XCircle size={13} />
-                  )}
-
-                  {course.status}
-                </div>
-
-                {course.status === 'pending' && (
-                  <div className="admin-approval-actions">
-                    <button
-                      type="button"
-                      className="admin-reject-button"
-                      onClick={() =>
-                        handleApproval(
-                          course.id,
-                          'rejected',
-                        )
-                      }
-                    >
-                      <XCircle size={15} />
-                      Reject
-                    </button>
-
-                    <button
-                      type="button"
-                      className="admin-approve-button"
-                      onClick={() =>
-                        handleApproval(
-                          course.id,
-                          'approved',
-                        )
-                      }
-                    >
-                      <CheckCircle2 size={15} />
-                      Approve
-                    </button>
+                  <div className="admin-course-icon">
+                    <BookOpen
+                      size={21}
+                    />
                   </div>
-                )}
-              </article>
-            ))}
+
+                  <div className="admin-course-main">
+                    <span>
+                      {
+                        course.category
+                      }
+                    </span>
+
+                    <h3>
+                      {
+                        course.title
+                      }
+                    </h3>
+
+                    <p>
+                      Submitted by{' '}
+                      <strong>
+                        {
+                          course.instructor
+                        }
+                      </strong>{' '}
+                      ·{' '}
+                      {
+                        course.lessons
+                      }{' '}
+                      lessons ·{' '}
+                      {
+                        course.submittedAt
+                      }
+                    </p>
+                  </div>
+
+                  <div
+                    className={`admin-approval-status ${course.status}`}
+                  >
+                    {course.status ===
+                      'pending' && (
+                      <Clock3
+                        size={13}
+                      />
+                    )}
+
+                    {course.status ===
+                      'approved' && (
+                      <CheckCircle2
+                        size={13}
+                      />
+                    )}
+
+                    {course.status ===
+                      'rejected' && (
+                      <XCircle
+                        size={13}
+                      />
+                    )}
+
+                    {course.status}
+                  </div>
+
+                  {course.status ===
+                    'pending' && (
+                    <div className="admin-approval-actions">
+                      <button
+                        type="button"
+                        className="admin-reject-button"
+                        onClick={() =>
+                          handleApproval(
+                            course.id,
+                            'rejected',
+                          )
+                        }
+                      >
+                        <XCircle
+                          size={
+                            15
+                          }
+                        />
+                        Reject
+                      </button>
+
+                      <button
+                        type="button"
+                        className="admin-approve-button"
+                        onClick={() =>
+                          handleApproval(
+                            course.id,
+                            'approved',
+                          )
+                        }
+                      >
+                        <CheckCircle2
+                          size={
+                            15
+                          }
+                        />
+                        Approve
+                      </button>
+                    </div>
+                  )}
+                </article>
+              ),
+            )}
           </div>
         </section>
       )}
 
-      {activeTab === 'users' && (
+      {activeTab ===
+        'users' && (
         <section className="admin-management-section">
           <div className="admin-section-heading">
             <div>
@@ -528,16 +839,26 @@ function AdminDashboard() {
                 Identity management
               </span>
 
-              <h2>Platform users</h2>
+              <h2>
+                Platform users
+              </h2>
 
               <p>
-                Search accounts and manage user access.
+                Search accounts,
+                change roles, manage
+                access and remove
+                users.
               </p>
             </div>
 
             <div className="admin-summary-box">
-              <strong>{activeUsers}</strong>
-              <span>Active</span>
+              <strong>
+                {activeUsers}
+              </strong>
+
+              <span>
+                Active
+              </span>
             </div>
           </div>
 
@@ -547,9 +868,16 @@ function AdminDashboard() {
 
               <input
                 type="search"
-                value={userSearch}
-                onChange={(event) =>
-                  setUserSearch(event.target.value)
+                value={
+                  userSearch
+                }
+                onChange={(
+                  event,
+                ) =>
+                  setUserSearch(
+                    event.target
+                      .value,
+                  )
                 }
                 placeholder="Search name or email..."
               />
@@ -557,17 +885,28 @@ function AdminDashboard() {
 
             <select
               value={roleFilter}
-              onChange={(event) =>
-                setRoleFilter(event.target.value)
+              onChange={(
+                event,
+              ) =>
+                setRoleFilter(
+                  event.target
+                    .value,
+                )
               }
+              aria-label="Filter users by role"
             >
-              <option value="all">All roles</option>
+              <option value="all">
+                All roles
+              </option>
+
               <option value="student">
                 Students
               </option>
+
               <option value="instructor">
                 Instructors
               </option>
+
               <option value="admin">
                 Admins
               </option>
@@ -582,95 +921,185 @@ function AdminDashboard() {
                   <th>Role</th>
                   <th>Joined</th>
                   <th>Status</th>
-                  <th>Access</th>
+                  <th>
+                    Actions
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td>
-                      <div className="admin-user-cell">
-                        <div>
-                          {user.name
-                            .charAt(0)
-                            .toUpperCase()}
+                {filteredUsers.map(
+                  (user) => (
+                    <tr
+                      key={
+                        user.id
+                      }
+                    >
+                      <td>
+                        <div className="admin-user-cell">
+                          <div>
+                            {user.name
+                              .charAt(
+                                0,
+                              )
+                              .toUpperCase()}
+                          </div>
+
+                          <section>
+                            <strong>
+                              {
+                                user.name
+                              }
+                            </strong>
+
+                            <span>
+                              {
+                                user.email
+                              }
+                            </span>
+                          </section>
                         </div>
+                      </td>
 
-                        <section>
-                          <strong>
-                            {user.name}
-                          </strong>
-
-                          <span>
-                            {user.email}
+                      <td>
+                        <div className="admin-role-manager">
+                          <span
+                            className={`admin-role-chip ${user.role}`}
+                          >
+                            {
+                              user.role
+                            }
                           </span>
-                        </section>
-                      </div>
-                    </td>
 
-                    <td>
-                      <span
-                        className={`admin-role-chip ${user.role}`}
-                      >
-                        {user.role}
-                      </span>
-                    </td>
+                          <select
+                            value={
+                              user.role
+                            }
+                            onChange={(
+                              event,
+                            ) =>
+                              handleUserRole(
+                                user.id,
+                                event
+                                  .target
+                                  .value as AdminUserRole,
+                              )
+                            }
+                            aria-label={`Change role for ${user.name}`}
+                          >
+                            <option value="student">
+                              Student
+                            </option>
 
-                    <td>{user.joinedAt}</td>
+                            <option value="instructor">
+                              Instructor
+                            </option>
 
-                    <td>
-                      <span
-                        className={`admin-user-status ${user.status}`}
-                      >
-                        {user.status}
-                      </span>
-                    </td>
+                            <option value="admin">
+                              Admin
+                            </option>
+                          </select>
+                        </div>
+                      </td>
 
-                    <td>
-                      {user.status === 'active' ? (
-                        <button
-                          type="button"
-                          className="suspend-user-button"
-                          onClick={() =>
-                            handleUserStatus(
-                              user.id,
-                              'suspended',
-                            )
-                          }
+                      <td>
+                        {
+                          user.joinedAt
+                        }
+                      </td>
+
+                      <td>
+                        <span
+                          className={`admin-user-status ${user.status}`}
                         >
-                          <UserX size={14} />
-                          Suspend
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="activate-user-button"
-                          onClick={() =>
-                            handleUserStatus(
-                              user.id,
-                              'active',
-                            )
+                          {
+                            user.status
                           }
-                        >
-                          <UserCheck size={14} />
-                          Activate
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="admin-user-actions">
+                          {user.status ===
+                          'active' ? (
+                            <button
+                              type="button"
+                              className="suspend-user-button"
+                              onClick={() =>
+                                handleUserStatus(
+                                  user.id,
+                                  'suspended',
+                                )
+                              }
+                            >
+                              <UserX
+                                size={
+                                  14
+                                }
+                              />
+                              Suspend
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="activate-user-button"
+                              onClick={() =>
+                                handleUserStatus(
+                                  user.id,
+                                  'active',
+                                )
+                              }
+                            >
+                              <UserCheck
+                                size={
+                                  14
+                                }
+                              />
+                              Activate
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            className="delete-user-button"
+                            onClick={() =>
+                              handleDeleteUser(
+                                user.id,
+                                user.name,
+                              )
+                            }
+                            aria-label={`Delete ${user.name}`}
+                          >
+                            <Trash2
+                              size={
+                                14
+                              }
+                            />
+
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ),
+                )}
               </tbody>
             </table>
 
-            {filteredUsers.length === 0 && (
+            {filteredUsers.length ===
+              0 && (
               <div className="admin-empty-state">
-                <Users size={24} />
+                <Users
+                  size={24}
+                />
 
-                <strong>No users found</strong>
+                <strong>
+                  No users found
+                </strong>
 
                 <span>
-                  Try another search or role filter.
+                  Try another search
+                  or role filter.
                 </span>
               </div>
             )}

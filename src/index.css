@@ -11495,3 +11495,162 @@ html[data-theme='dark']
     flex: 1;
   }
 }
+
+/* ==============================
+   Admin User Management Upgrade
+   ============================== */
+
+.admin-role-manager {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-role-manager select {
+  min-height: 31px;
+  padding: 0 8px;
+  color: #596072;
+  border: 1px solid #dfe1e8;
+  border-radius: 7px;
+  outline: none;
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.admin-role-manager select:focus {
+  border-color: #7569dc;
+  box-shadow:
+    0 0 0 3px
+    rgba(101, 88, 216, 0.1);
+}
+
+.admin-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.suspend-user-button,
+.activate-user-button,
+.delete-user-button {
+  border: 0;
+  font-family: inherit;
+}
+
+.delete-user-button {
+  display: inline-flex;
+  min-height: 31px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
+  color: #a54f4f;
+  border: 1px solid #efd6d6;
+  border-radius: 7px;
+  background: #fff7f7;
+  cursor: pointer;
+  font-size: 7px;
+  font-weight: 800;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.delete-user-button:hover {
+  border-color: #e4baba;
+  background: #ffeded;
+}
+
+.delete-user-button:active {
+  transform: translateY(1px);
+}
+
+.suspend-user-button,
+.activate-user-button {
+  border: 1px solid transparent;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.suspend-user-button:hover {
+  border-color: #efd1d1;
+  background: #ffe8e8;
+}
+
+.activate-user-button:hover {
+  border-color: #c8e3d6;
+  background: #dcf2e7;
+}
+
+/* Dark mode */
+
+html[data-theme='dark']
+  .admin-role-manager
+  select {
+  color: #e1e4ec;
+  border-color: #383d4e;
+  background: #161b29;
+}
+
+html[data-theme='dark']
+  .delete-user-button {
+  color: #eb9292;
+  border-color: #573838;
+  background: #352020;
+}
+
+html[data-theme='dark']
+  .delete-user-button:hover {
+  border-color: #704747;
+  background: #442626;
+}
+
+html[data-theme='dark']
+  .suspend-user-button {
+  color: #e49797;
+  border-color: #573838;
+  background: #352020;
+}
+
+html[data-theme='dark']
+  .activate-user-button {
+  color: #86c9a9;
+  border-color: #315440;
+  background: #1b3026;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .admin-user-table {
+    min-width: 860px;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-role-manager {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-role-manager select {
+    min-width: 105px;
+  }
+
+  .admin-user-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .suspend-user-button,
+  .activate-user-button,
+  .delete-user-button {
+    justify-content: center;
+  }
+}
