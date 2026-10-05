@@ -17,6 +17,7 @@ import InstructorAnalytics from '../components/instructor/InstructorAnalytics';
 import InstructorAnnouncements from '../components/instructor/InstructorAnnouncements';
 import InstructorAssignments from '../components/instructor/InstructorAssignments';
 import InstructorMaterials from '../components/instructor/InstructorMaterials';
+import InstructorQuizBuilder from '../components/instructor/InstructorQuizBuilder';
 import {
   weeklyAnalytics,
   type PricingTier,
@@ -28,6 +29,7 @@ type InstructorTab =
   | 'courses'
   | 'materials'
   | 'assignments'
+  | 'quiz-builder'
   | 'announcements'
   | 'analytics'
   | 'reviews'
@@ -204,9 +206,10 @@ function InstructorDashboard() {
           <p>
             Manage courses, learning
             materials, assignments,
-            announcements, analytics,
-            learners, student submissions
-            and AI-generated assessments.
+            quizzes, announcements,
+            analytics, learners,
+            submissions and AI-generated
+            assessments.
           </p>
         </div>
 
@@ -360,6 +363,23 @@ function InstructorDashboard() {
           }
         >
           Assignments
+        </button>
+
+        <button
+          type="button"
+          className={
+            activeTab ===
+            'quiz-builder'
+              ? 'active'
+              : ''
+          }
+          onClick={() =>
+            setActiveTab(
+              'quiz-builder',
+            )
+          }
+        >
+          Quiz Builder
         </button>
 
         <button
@@ -925,6 +945,11 @@ function InstructorDashboard() {
       {activeTab ===
         'assignments' && (
         <InstructorAssignments />
+      )}
+
+      {activeTab ===
+        'quiz-builder' && (
+        <InstructorQuizBuilder />
       )}
 
       {activeTab ===
