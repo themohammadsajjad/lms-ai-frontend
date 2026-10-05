@@ -6,6 +6,8 @@ export type MaterialType =
 export interface CourseMaterial {
   id: string;
   courseId: string;
+  moduleName: string;
+  lectureName: string;
   title: string;
   type: MaterialType;
   fileName: string;
@@ -16,6 +18,8 @@ export interface CourseMaterial {
 
 export interface UploadMaterialData {
   courseId: string;
+  moduleName: string;
+  lectureName: string;
   title: string;
   type: MaterialType;
   file: File;
@@ -24,7 +28,22 @@ export interface UploadMaterialData {
 const MATERIALS_KEY =
   'lms_instructor_materials';
 
-function readMaterials(): CourseMaterial[] {
+function normalizeMaterial(
+  material: CourseMaterial,
+): CourseMaterial {
+  return {
+    ...material,
+    moduleName:
+      material.moduleName ||
+      'General module',
+    lectureName:
+      material.lectureName ||
+      'General lecture',
+  };
+}
+
+function readMaterials():
+  CourseMaterial[] {
   const stored =
     localStorage.getItem(
       MATERIALS_KEY,
@@ -35,9 +54,14 @@ function readMaterials(): CourseMaterial[] {
   }
 
   try {
-    return JSON.parse(
-      stored,
-    ) as CourseMaterial[];
+    const parsed =
+      JSON.parse(
+        stored,
+      ) as CourseMaterial[];
+
+    return parsed.map(
+      normalizeMaterial,
+    );
   } catch {
     return [];
   }
@@ -53,7 +77,8 @@ function saveMaterials(
 }
 
 export const instructorMaterialService = {
-  getMaterials(): CourseMaterial[] {
+  getMaterials():
+    CourseMaterial[] {
     return readMaterials();
   },
 
@@ -67,20 +92,47 @@ export const instructorMaterialService = {
     );
   },
 
+  getMaterialsForLecture(
+    courseId: string,
+    moduleName: string,
+    lectureName: string,
+  ): CourseMaterial[] {
+    return readMaterials().filter(
+      (material) =>
+        material.courseId ===
+          courseId &&
+        material.moduleName ===
+          moduleName &&
+        material.lectureName ===
+          lectureName,
+    );
+  },
+
   uploadMaterial(
     data: UploadMaterialData,
   ): CourseMaterial[] {
     const materials =
       readMaterials();
 
-    const newMaterial: CourseMaterial = {
+    const newMaterial:
+      CourseMaterial = {
       id: crypto.randomUUID(),
-      courseId: data.courseId,
-      title: data.title.trim(),
-      type: data.type,
-      fileName: data.file.name,
-      fileSize: data.file.size,
-      fileType: data.file.type,
+      courseId:
+        data.courseId,
+      moduleName:
+        data.moduleName.trim(),
+      lectureName:
+        data.lectureName.trim(),
+      title:
+        data.title.trim(),
+      type:
+        data.type,
+      fileName:
+        data.file.name,
+      fileSize:
+        data.file.size,
+      fileType:
+        data.file.type,
       uploadedAt:
         new Date().toISOString(),
     };
@@ -113,8 +165,10 @@ export const instructorMaterialService = {
   getMaterialCountForCourse(
     courseId: string,
   ): number {
-    return this.getMaterialsForCourse(
-      courseId,
-    ).length;
+    return this
+      .getMaterialsForCourse(
+        courseId,
+      )
+      .length;
   },
 };
