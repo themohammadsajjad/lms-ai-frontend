@@ -12,14 +12,23 @@ import { authService } from '../../services/authService';
 import { notificationService } from '../../services/communicationService';
 
 function Topbar() {
-  const navigate = useNavigate();
-  const user = authService.getCurrentUser();
+  const navigate =
+    useNavigate();
 
-  const [search, setSearch] = useState('');
-  const [unreadCount, setUnreadCount] =
-    useState(
-      notificationService.getUnreadCount(),
-    );
+  const user =
+    authService.getCurrentUser();
+
+  const [
+    search,
+    setSearch,
+  ] = useState('');
+
+  const [
+    unreadCount,
+    setUnreadCount,
+  ] = useState(
+    notificationService.getUnreadCount(),
+  );
 
   useEffect(() => {
     function updateNotifications() {
@@ -46,7 +55,8 @@ function Topbar() {
   ) {
     event.preventDefault();
 
-    const value = search.trim();
+    const value =
+      search.trim();
 
     if (value) {
       navigate(
@@ -55,12 +65,22 @@ function Topbar() {
         )}`,
       );
     } else {
-      navigate('/courses');
+      navigate(
+        '/courses',
+      );
     }
   }
 
+  const notificationLabel =
+    unreadCount > 0
+      ? `Notifications, ${unreadCount} unread`
+      : 'Notifications';
+
   return (
-    <header className="topbar">
+    <header
+      className="topbar"
+      aria-label="Application toolbar"
+    >
       <div>
         <span className="topbar-eyebrow">
           Learning workspace
@@ -68,24 +88,43 @@ function Topbar() {
 
         <h2>
           Welcome back,{' '}
-          {user?.name?.split(' ')[0]}
+          {
+            user?.name?.split(
+              ' ',
+            )[0]
+          }
         </h2>
       </div>
 
       <div className="topbar-actions">
-        {user?.role === 'student' && (
+        {user?.role ===
+          'student' && (
           <form
             className="topbar-search"
-            onSubmit={handleSearch}
+            onSubmit={
+              handleSearch
+            }
+            role="search"
+            aria-label="Course search"
           >
-            <Search size={18} />
+            <Search
+              size={18}
+              aria-hidden="true"
+            />
 
             <input
               type="search"
               placeholder="Search courses..."
-              value={search}
-              onChange={(event) =>
-                setSearch(event.target.value)
+              value={
+                search
+              }
+              onChange={(
+                event,
+              ) =>
+                setSearch(
+                  event.target
+                    .value,
+                )
               }
               aria-label="Search courses"
             />
@@ -93,34 +132,62 @@ function Topbar() {
         )}
 
         <button
+          type="button"
           className="icon-button"
-          aria-label="Notifications"
+          aria-label={
+            notificationLabel
+          }
+          title="Notifications"
           onClick={() =>
-            navigate('/notifications')
+            navigate(
+              '/notifications',
+            )
           }
         >
-          <Bell size={20} />
+          <Bell
+            size={20}
+            aria-hidden="true"
+          />
 
-          {unreadCount > 0 && (
+          {unreadCount >
+            0 && (
             <>
-              <span className="notification-dot" />
+              <span
+                className="notification-dot"
+                aria-hidden="true"
+              />
 
-              <span className="notification-count">
-                {unreadCount}
+              <span
+                className="notification-count"
+                aria-hidden="true"
+              >
+                {
+                  unreadCount
+                }
               </span>
             </>
           )}
         </button>
 
         <div className="topbar-profile">
-          <div className="topbar-avatar">
-            {user?.name?.charAt(0).toUpperCase() ||
+          <div
+            className="topbar-avatar"
+            aria-hidden="true"
+          >
+            {user?.name
+              ?.charAt(0)
+              .toUpperCase() ||
               'U'}
           </div>
 
           <div>
-            <strong>{user?.name}</strong>
-            <span>{user?.role}</span>
+            <strong>
+              {user?.name}
+            </strong>
+
+            <span>
+              {user?.role}
+            </span>
           </div>
         </div>
       </div>

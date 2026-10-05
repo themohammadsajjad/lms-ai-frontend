@@ -13,146 +13,234 @@ import {
   Sparkles,
   WandSparkles,
 } from 'lucide-react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import {
+  NavLink,
+  useNavigate,
+} from 'react-router-dom';
 import { authService } from '../../services/authService';
 
 function Sidebar() {
-  const navigate = useNavigate();
-  const user = authService.getCurrentUser();
+  const navigate =
+    useNavigate();
+
+  const user =
+    authService.getCurrentUser();
 
   const navigation =
-    user?.role === 'instructor'
+    user?.role ===
+    'instructor'
       ? [
           {
             to: '/instructor',
-            label: 'Instructor',
+            label:
+              'Instructor',
             icon: Presentation,
           },
         ]
-      : user?.role === 'admin'
+      : user?.role ===
+          'admin'
         ? [
             {
               to: '/admin',
-              label: 'Administration',
-              icon: ShieldCheck,
+              label:
+                'Administration',
+              icon:
+                ShieldCheck,
             },
           ]
         : [
             {
               to: '/dashboard',
-              label: 'Dashboard',
-              icon: LayoutDashboard,
+              label:
+                'Dashboard',
+              icon:
+                LayoutDashboard,
             },
             {
               to: '/courses',
-              label: 'Courses',
-              icon: BookOpen,
+              label:
+                'Courses',
+              icon:
+                BookOpen,
             },
             {
               to: '/assignments',
-              label: 'Assignments',
-              icon: ClipboardCheck,
+              label:
+                'Assignments',
+              icon:
+                ClipboardCheck,
             },
             {
               to: '/quizzes',
-              label: 'Quizzes',
-              icon: HelpCircle,
+              label:
+                'Quizzes',
+              icon:
+                HelpCircle,
             },
             {
               to: '/ai-tutor',
-              label: 'AI Tutor',
-              icon: Sparkles,
+              label:
+                'AI Tutor',
+              icon:
+                Sparkles,
             },
             {
               to: '/study-tools',
-              label: 'Study Tools',
-              icon: WandSparkles,
+              label:
+                'Study Tools',
+              icon:
+                WandSparkles,
             },
             {
               to: '/achievements',
-              label: 'Achievements',
-              icon: Award,
+              label:
+                'Achievements',
+              icon:
+                Award,
             },
             {
               to: '/discussions',
-              label: 'Discussions',
-              icon: MessageCircle,
+              label:
+                'Discussions',
+              icon:
+                MessageCircle,
             },
           ];
 
   function handleLogout() {
     authService.logout();
-    navigate('/login');
+
+    navigate(
+      '/login',
+    );
   }
 
   return (
-    <aside className="sidebar">
+    <aside
+      className="sidebar"
+      aria-label="Primary navigation"
+    >
       <div className="sidebar-brand">
-        <div className="sidebar-brand-icon">
-          <BrainCircuit size={23} />
+        <div
+          className="sidebar-brand-icon"
+          aria-hidden="true"
+        >
+          <BrainCircuit
+            size={23}
+          />
         </div>
 
         <div>
-          <strong>VertexLearn</strong>
-          <span>Learning Platform</span>
+          <strong>
+            VertexLearn
+          </strong>
+
+          <span>
+            Learning Platform
+          </span>
         </div>
       </div>
 
-      <nav className="sidebar-nav">
+      <nav
+        className="sidebar-nav"
+        aria-label="Workspace navigation"
+      >
         <span className="sidebar-label">
           Workspace
         </span>
 
-        {navigation.map((item) => {
-          const Icon = item.icon;
+        {navigation.map(
+          (item) => {
+            const Icon =
+              item.icon;
 
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `sidebar-link ${
-                  isActive ? 'active' : ''
-                }`
-              }
-            >
-              <Icon size={19} />
-              {item.label}
-            </NavLink>
-          );
-        })}
+            return (
+              <NavLink
+                key={
+                  item.to
+                }
+                to={
+                  item.to
+                }
+                className={({
+                  isActive,
+                }) =>
+                  `sidebar-link ${
+                    isActive
+                      ? 'active'
+                      : ''
+                  }`
+                }
+              >
+                <Icon
+                  size={19}
+                  aria-hidden="true"
+                />
+
+                {
+                  item.label
+                }
+              </NavLink>
+            );
+          },
+        )}
       </nav>
 
       <div className="sidebar-bottom">
         <NavLink
           to="/settings"
-          className={({ isActive }) =>
+          className={({
+            isActive,
+          }) =>
             `sidebar-link ${
-              isActive ? 'active' : ''
+              isActive
+                ? 'active'
+                : ''
             }`
           }
         >
-          <Settings size={19} />
+          <Settings
+            size={19}
+            aria-hidden="true"
+          />
+
           Settings
         </NavLink>
 
         <div className="sidebar-user">
-          <div className="sidebar-avatar">
-            {user?.name?.charAt(0).toUpperCase() ||
+          <div
+            className="sidebar-avatar"
+            aria-hidden="true"
+          >
+            {user?.name
+              ?.charAt(0)
+              .toUpperCase() ||
               'U'}
           </div>
 
           <div className="sidebar-user-details">
-            <strong>{user?.name}</strong>
-            <span>{user?.role}</span>
+            <strong>
+              {user?.name}
+            </strong>
+
+            <span>
+              {user?.role}
+            </span>
           </div>
 
           <button
+            type="button"
             className="sidebar-logout"
-            onClick={handleLogout}
-            aria-label="Sign out"
+            onClick={
+              handleLogout
+            }
+            aria-label="Sign out of VertexLearn"
+            title="Sign out"
           >
-            <LogOut size={17} />
+            <LogOut
+              size={17}
+              aria-hidden="true"
+            />
           </button>
         </div>
       </div>

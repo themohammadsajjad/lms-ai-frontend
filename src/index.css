@@ -14130,3 +14130,57 @@ html[data-theme='dark']
       auto;
   }
 }
+
+/* ==============================
+   Accessibility
+   ============================== */
+
+.skip-to-content {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 9999;
+  padding: 10px 14px;
+  color: #ffffff;
+  border-radius: 8px;
+  background: #4f46c7;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  transform: translateY(-150%);
+  transition: transform 0.2s ease;
+}
+
+.skip-to-content:focus {
+  transform: translateY(0);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #7c72df;
+  outline-offset: 3px;
+}
+
+html[data-theme='dark']
+  .skip-to-content {
+  color: #ffffff;
+  background: #7065d8;
+}
+
+/* ==============================
+   Reduced Motion Accessibility
+   ============================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
