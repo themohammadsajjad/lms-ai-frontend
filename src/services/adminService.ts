@@ -7,10 +7,16 @@ import {
   type CourseApprovalStatus,
   type PlatformUser,
 } from '../data/adminData';
+import type { InstructorCourse } from '../data/instructorData';
 
-const USERS_KEY = 'lms_admin_users';
+const USERS_KEY =
+  'lms_admin_users';
+
 const APPROVALS_KEY =
   'lms_admin_course_approvals';
+
+const INSTRUCTOR_COURSES_KEY =
+  'lms_instructor_courses';
 
 function readUsers(): PlatformUser[] {
   const stored =
@@ -21,7 +27,9 @@ function readUsers(): PlatformUser[] {
   if (!stored) {
     localStorage.setItem(
       USERS_KEY,
-      JSON.stringify(platformUsers),
+      JSON.stringify(
+        platformUsers,
+      ),
     );
 
     return platformUsers;
@@ -34,7 +42,9 @@ function readUsers(): PlatformUser[] {
   } catch {
     localStorage.setItem(
       USERS_KEY,
-      JSON.stringify(platformUsers),
+      JSON.stringify(
+        platformUsers,
+      ),
     );
 
     return platformUsers;
@@ -50,7 +60,8 @@ function saveUsers(
   );
 }
 
-function readApprovals(): CourseApproval[] {
+function readApprovals():
+  CourseApproval[] {
   const stored =
     localStorage.getItem(
       APPROVALS_KEY,
@@ -92,6 +103,79 @@ function saveApprovals(
   );
 }
 
+function readInstructorCourses():
+  InstructorCourse[] {
+  const stored =
+    localStorage.getItem(
+      INSTRUCTOR_COURSES_KEY,
+    );
+
+  if (!stored) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(
+      stored,
+    ) as InstructorCourse[];
+  } catch {
+    return [];
+  }
+}
+
+function saveInstructorCourses(
+  courses: InstructorCourse[],
+) {
+  localStorage.setItem(
+    INSTRUCTOR_COURSES_KEY,
+    JSON.stringify(courses),
+  );
+}
+
+function syncInstructorCourseStatus(
+  approval: CourseApproval,
+  status: CourseApprovalStatus,
+) {
+  if (
+    !approval.sourceCourseId
+  ) {
+    return;
+  }
+
+  const courses =
+    readInstructorCourses();
+
+  const updated =
+    courses.map(
+      (course) => {
+        if (
+          course.id !==
+          approval.sourceCourseId
+        ) {
+          return course;
+        }
+
+        return {
+          ...course,
+          status:
+            status ===
+            'approved'
+              ? 'published'
+              : status ===
+                  'rejected'
+                ? 'rejected'
+                : 'pending',
+          updatedAt:
+            'Just now',
+        } as InstructorCourse;
+      },
+    );
+
+  saveInstructorCourses(
+    updated,
+  );
+}
+
 export const adminService = {
   getUsers(): PlatformUser[] {
     return readUsers();
@@ -105,7 +189,8 @@ export const adminService = {
       readUsers().map(
         (user) => {
           if (
-            user.id !== userId
+            user.id !==
+            userId
           ) {
             return user;
           }
@@ -130,7 +215,8 @@ export const adminService = {
       readUsers().map(
         (user) => {
           if (
-            user.id !== userId
+            user.id !==
+            userId
           ) {
             return user;
           }
@@ -170,8 +256,18 @@ export const adminService = {
     courseId: string,
     status: CourseApprovalStatus,
   ): CourseApproval[] {
+    const approvals =
+      readApprovals();
+
+    const selectedApproval =
+      approvals.find(
+        (course) =>
+          course.id ===
+          courseId,
+      );
+
     const updated =
-      readApprovals().map(
+      approvals.map(
         (course) => {
           if (
             course.id !==
@@ -187,19 +283,33 @@ export const adminService = {
         },
       );
 
-    saveApprovals(updated);
+    saveApprovals(
+      updated,
+    );
+
+    if (
+      selectedApproval
+    ) {
+      syncInstructorCourseStatus(
+        selectedApproval,
+        status,
+      );
+    }
 
     return updated;
   },
 
-  getActiveUserCount(): number {
+  getActiveUserCount():
+    number {
     return readUsers().filter(
       (user) =>
-        user.status === 'active',
+        user.status ===
+        'active',
     ).length;
   },
 
-  getInstructorCount(): number {
+  getInstructorCount():
+    number {
     return readUsers().filter(
       (user) =>
         user.role ===
@@ -207,7 +317,8 @@ export const adminService = {
     ).length;
   },
 
-  getPendingApprovalCount(): number {
+  getPendingApprovalCount():
+    number {
     return readApprovals().filter(
       (course) =>
         course.status ===
@@ -215,7 +326,8 @@ export const adminService = {
     ).length;
   },
 
-  getApprovedCourseCount(): number {
+  getApprovedCourseCount():
+    number {
     return readApprovals().filter(
       (course) =>
         course.status ===

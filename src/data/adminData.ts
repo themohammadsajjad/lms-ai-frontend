@@ -1,5 +1,11 @@
-export type AdminUserRole = 'student' | 'instructor' | 'admin';
-export type AdminUserStatus = 'active' | 'suspended';
+export type AdminUserRole =
+  | 'student'
+  | 'instructor'
+  | 'admin';
+
+export type AdminUserStatus =
+  | 'active'
+  | 'suspended';
 
 export interface PlatformUser {
   id: string;
@@ -17,6 +23,7 @@ export type CourseApprovalStatus =
 
 export interface CourseApproval {
   id: string;
+  sourceCourseId?: string;
   title: string;
   instructor: string;
   category: string;
@@ -30,7 +37,10 @@ export interface PlatformActivity {
   title: string;
   description: string;
   time: string;
-  type: 'user' | 'course' | 'system';
+  type:
+    | 'user'
+    | 'course'
+    | 'system';
 }
 
 export const platformUsers: PlatformUser[] = [
@@ -98,18 +108,21 @@ export const courseApprovals: CourseApproval[] = [
     id: 'approval-2',
     title: 'Practical Deep Learning',
     instructor: 'Rahul Verma',
-    category: 'Artificial Intelligence',
+    category:
+      'Artificial Intelligence',
     lessons: 26,
     submittedAt: 'Today, 8:10 AM',
     status: 'pending',
   },
   {
     id: 'approval-3',
-    title: 'Design Systems for Products',
+    title:
+      'Design Systems for Products',
     instructor: 'Aisha Khan',
     category: 'Design',
     lessons: 14,
-    submittedAt: 'Yesterday, 6:42 PM',
+    submittedAt:
+      'Yesterday, 6:42 PM',
     status: 'pending',
   },
   {
@@ -123,7 +136,8 @@ export const courseApprovals: CourseApproval[] = [
   },
   {
     id: 'approval-5',
-    title: 'Legacy JavaScript Techniques',
+    title:
+      'Legacy JavaScript Techniques',
     instructor: 'Vikram Singh',
     category: 'Web Development',
     lessons: 12,
@@ -135,7 +149,8 @@ export const courseApprovals: CourseApproval[] = [
 export const platformActivity: PlatformActivity[] = [
   {
     id: 'activity-1',
-    title: 'New instructor joined',
+    title:
+      'New instructor joined',
     description:
       'Aisha Khan joined the instructor workspace.',
     time: '35 minutes ago',
@@ -143,7 +158,8 @@ export const platformActivity: PlatformActivity[] = [
   },
   {
     id: 'activity-2',
-    title: 'Course submitted for approval',
+    title:
+      'Course submitted for approval',
     description:
       'Advanced React Patterns is waiting for admin review.',
     time: '1 hour ago',
@@ -151,7 +167,8 @@ export const platformActivity: PlatformActivity[] = [
   },
   {
     id: 'activity-3',
-    title: 'Platform health check completed',
+    title:
+      'Platform health check completed',
     description:
       'Core learning services are operating normally.',
     time: '3 hours ago',
@@ -159,7 +176,8 @@ export const platformActivity: PlatformActivity[] = [
   },
   {
     id: 'activity-4',
-    title: 'New learner registration',
+    title:
+      'New learner registration',
     description:
       'A new student account was created successfully.',
     time: 'Yesterday',

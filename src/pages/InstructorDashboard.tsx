@@ -125,11 +125,41 @@ function InstructorDashboard() {
   function handleCourseStatus(
     courseId: string,
   ) {
-    setCourses(
-      instructorService.toggleCourseStatus(
-        courseId,
-      ),
-    );
+    const course =
+      courses.find(
+        (item) =>
+          item.id === courseId,
+      );
+
+    if (!course) {
+      return;
+    }
+
+    if (
+      course.status ===
+      'published'
+    ) {
+      setCourses(
+        instructorService.moveCourseToDraft(
+          courseId,
+        ),
+      );
+
+      return;
+    }
+
+    if (
+      course.status ===
+        'draft' ||
+      course.status ===
+        'rejected'
+    ) {
+      setCourses(
+        instructorService.submitCourseForApproval(
+          courseId,
+        ),
+      );
+    }
   }
 
   function handleReview(
@@ -757,9 +787,10 @@ function InstructorDashboard() {
               </h2>
 
               <p>
-                Create courses, monitor
-                learner activity and
-                control publishing status.
+                Create courses, submit
+                drafts for admin review
+                and manage approved
+                publishing status.
               </p>
             </div>
 
@@ -806,9 +837,16 @@ function InstructorDashboard() {
                     <span
                       className={`course-publish-status ${course.status}`}
                     >
-                      {
-                        course.status
-                      }
+                      {course.status ===
+                      'pending'
+                        ? 'Pending review'
+                        : course.status ===
+                            'rejected'
+                          ? 'Rejected'
+                          : course.status ===
+                              'published'
+                            ? 'Published'
+                            : 'Draft'}
                     </span>
                   </div>
 
@@ -916,7 +954,17 @@ function InstructorDashboard() {
                         course.status ===
                         'published'
                           ? 'unpublish'
-                          : 'publish'
+                          : course.status ===
+                              'pending'
+                            ? 'pending'
+                            : course.status ===
+                                'rejected'
+                              ? 'resubmit'
+                              : 'publish'
+                      }
+                      disabled={
+                        course.status ===
+                        'pending'
                       }
                       onClick={() =>
                         handleCourseStatus(
@@ -927,7 +975,13 @@ function InstructorDashboard() {
                       {course.status ===
                       'published'
                         ? 'Move to draft'
-                        : 'Publish course'}
+                        : course.status ===
+                            'pending'
+                          ? 'Awaiting admin review'
+                          : course.status ===
+                              'rejected'
+                            ? 'Re-submit for approval'
+                            : 'Submit for approval'}
                     </button>
                   </div>
                 </article>
@@ -1079,6 +1133,7 @@ function InstructorDashboard() {
                         <XCircle
                           size={15}
                         />
+
                         Request changes
                       </button>
 
@@ -1095,6 +1150,7 @@ function InstructorDashboard() {
                         <CheckCircle2
                           size={15}
                         />
+
                         Approve
                       </button>
                     </div>
@@ -1309,6 +1365,7 @@ function InstructorDashboard() {
                         <XCircle
                           size={15}
                         />
+
                         Request changes
                       </button>
 
@@ -1325,6 +1382,7 @@ function InstructorDashboard() {
                         <CheckCircle2
                           size={15}
                         />
+
                         Approve quiz
                       </button>
                     </div>

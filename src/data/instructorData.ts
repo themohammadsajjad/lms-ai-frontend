@@ -14,7 +14,11 @@ export interface InstructorCourse {
   lessons: number;
   completionRate: number;
   rating: number;
-  status: 'published' | 'draft';
+  status:
+  | 'draft'
+  | 'pending'
+  | 'published'
+  | 'rejected';
   updatedAt: string;
 }
 

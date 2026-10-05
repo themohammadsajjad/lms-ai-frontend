@@ -1,4 +1,8 @@
 import {
+  courseApprovals,
+  type CourseApproval,
+} from '../data/adminData';
+import {
   aiQuizDrafts,
   assignmentReviews,
   instructorCourses,
@@ -7,6 +11,7 @@ import {
   type InstructorCourse,
   type PricingTier,
 } from '../data/instructorData';
+import { authService } from './authService';
 
 const COURSES_KEY =
   'lms_instructor_courses';
@@ -17,6 +22,9 @@ const REVIEWS_KEY =
 const AI_QUIZZES_KEY =
   'lms_instructor_ai_quizzes';
 
+const APPROVALS_KEY =
+  'lms_admin_course_approvals';
+
 export interface CreateCourseData {
   title: string;
   description: string;
@@ -25,7 +33,8 @@ export interface CreateCourseData {
   pricingTier: PricingTier;
 }
 
-function readCourses(): InstructorCourse[] {
+function readCourses():
+  InstructorCourse[] {
   const stored =
     localStorage.getItem(
       COURSES_KEY,
@@ -67,7 +76,51 @@ function saveCourses(
   );
 }
 
-function readReviews(): AssignmentReview[] {
+function readCourseApprovals():
+  CourseApproval[] {
+  const stored =
+    localStorage.getItem(
+      APPROVALS_KEY,
+    );
+
+  if (!stored) {
+    localStorage.setItem(
+      APPROVALS_KEY,
+      JSON.stringify(
+        courseApprovals,
+      ),
+    );
+
+    return courseApprovals;
+  }
+
+  try {
+    return JSON.parse(
+      stored,
+    ) as CourseApproval[];
+  } catch {
+    localStorage.setItem(
+      APPROVALS_KEY,
+      JSON.stringify(
+        courseApprovals,
+      ),
+    );
+
+    return courseApprovals;
+  }
+}
+
+function saveCourseApprovals(
+  approvals: CourseApproval[],
+) {
+  localStorage.setItem(
+    APPROVALS_KEY,
+    JSON.stringify(approvals),
+  );
+}
+
+function readReviews():
+  AssignmentReview[] {
   const stored =
     localStorage.getItem(
       REVIEWS_KEY,
@@ -109,7 +162,8 @@ function saveReviews(
   );
 }
 
-function readAIQuizDrafts(): AIQuizDraft[] {
+function readAIQuizDrafts():
+  AIQuizDraft[] {
   const stored =
     localStorage.getItem(
       AI_QUIZZES_KEY,
@@ -151,8 +205,91 @@ function saveAIQuizDrafts(
   );
 }
 
+function createOrUpdateApproval(
+  course: InstructorCourse,
+) {
+  const approvals =
+    readCourseApprovals();
+
+  const currentUser =
+    authService.getCurrentUser();
+
+  const instructorName =
+    currentUser?.role ===
+    'instructor'
+      ? currentUser.name
+      : 'Instructor';
+
+  const existing =
+    approvals.find(
+      (approval) =>
+        approval.sourceCourseId ===
+        course.id,
+    );
+
+  if (existing) {
+    const updated =
+      approvals.map(
+        (approval) => {
+          if (
+            approval.sourceCourseId !==
+            course.id
+          ) {
+            return approval;
+          }
+
+          return {
+            ...approval,
+            title:
+              course.title,
+            instructor:
+              instructorName,
+            category:
+              course.category,
+            lessons:
+              course.lessons,
+            submittedAt:
+              new Date().toLocaleString(),
+            status:
+              'pending' as const,
+          };
+        },
+      );
+
+    saveCourseApprovals(
+      updated,
+    );
+
+    return;
+  }
+
+  const newApproval:
+    CourseApproval = {
+    id: crypto.randomUUID(),
+    sourceCourseId:
+      course.id,
+    title:
+      course.title,
+    instructor:
+      instructorName,
+    category:
+      course.category,
+    lessons:
+      course.lessons,
+    submittedAt:
+      new Date().toLocaleString(),
+    status: 'pending',
+  };
+
+  saveCourseApprovals([
+    newApproval,
+    ...approvals,
+  ]);
+}
+
 export const instructorService = {
-  getCourses(): InstructorCourse[] {
+  getCourses():
+    InstructorCourse[] {
     return readCourses();
   },
 
@@ -162,9 +299,11 @@ export const instructorService = {
     const courses =
       readCourses();
 
-    const newCourse: InstructorCourse = {
+    const newCourse:
+      InstructorCourse = {
       id: crypto.randomUUID(),
-      title: data.title.trim(),
+      title:
+        data.title.trim(),
       description:
         data.description.trim(),
       category:
@@ -186,19 +325,46 @@ export const instructorService = {
       ...courses,
     ];
 
-    saveCourses(updated);
+    saveCourses(
+      updated,
+    );
 
     return updated;
   },
 
-  toggleCourseStatus(
+  submitCourseForApproval(
     courseId: string,
   ): InstructorCourse[] {
+    const courses =
+      readCourses();
+
+    const selectedCourse =
+      courses.find(
+        (course) =>
+          course.id ===
+          courseId,
+      );
+
+    if (
+      !selectedCourse ||
+      selectedCourse.status ===
+        'pending' ||
+      selectedCourse.status ===
+        'published'
+    ) {
+      return courses;
+    }
+
+    createOrUpdateApproval(
+      selectedCourse,
+    );
+
     const updated =
-      readCourses().map(
+      courses.map(
         (course) => {
           if (
-            course.id !== courseId
+            course.id !==
+            courseId
           ) {
             return course;
           }
@@ -206,21 +372,102 @@ export const instructorService = {
           return {
             ...course,
             status:
-              course.status ===
-              'published'
-                ? 'draft'
-                : 'published',
-            updatedAt: 'Just now',
+              'pending',
+            updatedAt:
+              'Just now',
           } as InstructorCourse;
         },
       );
 
-    saveCourses(updated);
+    saveCourses(
+      updated,
+    );
 
     return updated;
   },
 
-  getReviews(): AssignmentReview[] {
+  moveCourseToDraft(
+    courseId: string,
+  ): InstructorCourse[] {
+    const updated =
+      readCourses().map(
+        (course) => {
+          if (
+            course.id !==
+            courseId
+          ) {
+            return course;
+          }
+
+          if (
+            course.status !==
+            'published'
+          ) {
+            return course;
+          }
+
+          return {
+            ...course,
+            status:
+              'draft',
+            updatedAt:
+              'Just now',
+          } as InstructorCourse;
+        },
+      );
+
+    saveCourses(
+      updated,
+    );
+
+    return updated;
+  },
+
+  /*
+   * Temporary compatibility for the
+   * current InstructorDashboard UI.
+   * The next step replaces the old
+   * direct-publish button labels.
+   */
+  toggleCourseStatus(
+    courseId: string,
+  ): InstructorCourse[] {
+    const course =
+      readCourses().find(
+        (item) =>
+          item.id ===
+          courseId,
+      );
+
+    if (!course) {
+      return readCourses();
+    }
+
+    if (
+      course.status ===
+      'published'
+    ) {
+      return this.moveCourseToDraft(
+        courseId,
+      );
+    }
+
+    if (
+      course.status ===
+        'draft' ||
+      course.status ===
+        'rejected'
+    ) {
+      return this.submitCourseForApproval(
+        courseId,
+      );
+    }
+
+    return readCourses();
+  },
+
+  getReviews():
+    AssignmentReview[] {
     return readReviews();
   },
 
@@ -246,12 +493,15 @@ export const instructorService = {
         },
       );
 
-    saveReviews(updated);
+    saveReviews(
+      updated,
+    );
 
     return updated;
   },
 
-  getPendingReviewCount(): number {
+  getPendingReviewCount():
+    number {
     return readReviews().filter(
       (review) =>
         review.status ===
@@ -259,7 +509,8 @@ export const instructorService = {
     ).length;
   },
 
-  getAIQuizDrafts(): AIQuizDraft[] {
+  getAIQuizDrafts():
+    AIQuizDraft[] {
     return readAIQuizDrafts();
   },
 
@@ -272,7 +523,8 @@ export const instructorService = {
       readAIQuizDrafts().map(
         (quiz) => {
           if (
-            quiz.id !== quizId
+            quiz.id !==
+            quizId
           ) {
             return quiz;
           }
@@ -284,12 +536,15 @@ export const instructorService = {
         },
       );
 
-    saveAIQuizDrafts(updated);
+    saveAIQuizDrafts(
+      updated,
+    );
 
     return updated;
   },
 
-  getPendingAIQuizCount(): number {
+  getPendingAIQuizCount():
+    number {
     return readAIQuizDrafts().filter(
       (quiz) =>
         quiz.status ===
@@ -297,31 +552,42 @@ export const instructorService = {
     ).length;
   },
 
-  getTotalLearners(): number {
+  getTotalLearners():
+    number {
     return readCourses().reduce(
-      (total, course) =>
-        total + course.learners,
+      (
+        total,
+        course,
+      ) =>
+        total +
+        course.learners,
       0,
     );
   },
 
-  getAverageCompletion(): number {
+  getAverageCompletion():
+    number {
     const courses =
       readCourses();
 
     if (
-      courses.length === 0
+      courses.length ===
+      0
     ) {
       return 0;
     }
 
     return Math.round(
       courses.reduce(
-        (total, course) =>
+        (
+          total,
+          course,
+        ) =>
           total +
           course.completionRate,
         0,
-      ) / courses.length,
+      ) /
+        courses.length,
     );
   },
 };

@@ -13437,3 +13437,67 @@ html[data-theme='dark']
     text-align: center;
   }
 }
+
+/* Instructor course approval states */
+
+.course-publish-status.pending {
+  color: #8b6a1f;
+  background: #fff4d8;
+}
+
+.course-publish-status.rejected {
+  color: #a34f4f;
+  background: #fff0f0;
+}
+
+.instructor-course-footer button.pending {
+  color: #8b6a1f;
+  border: 1px solid #ead79f;
+  background: #fff6df;
+  cursor: not-allowed;
+}
+
+.instructor-course-footer button.resubmit {
+  color: #fff;
+  background: #b45d5d;
+}
+
+.instructor-course-footer button.resubmit:hover {
+  background: #9f4f4f;
+}
+
+.instructor-course-footer button.pending:disabled {
+  opacity: 1;
+}
+
+/* Dark mode */
+
+html[data-theme='dark']
+  .course-publish-status.pending {
+  color: #e5c56d;
+  background: #3a321f;
+}
+
+html[data-theme='dark']
+  .course-publish-status.rejected {
+  color: #efa3a3;
+  background: #3a2428;
+}
+
+html[data-theme='dark']
+  .instructor-course-footer button.pending {
+  color: #e5c56d;
+  border-color: #5b5032;
+  background: #302a1d;
+}
+
+html[data-theme='dark']
+  .instructor-course-footer button.resubmit {
+  color: #fff;
+  background: #985050;
+}
+
+html[data-theme='dark']
+  .instructor-course-footer button.resubmit:hover {
+  background: #844343;
+}
