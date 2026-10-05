@@ -4,6 +4,7 @@ import {
   BookOpen,
   CheckCircle2,
   Clock3,
+  Flag,
   GraduationCap,
   Search,
   ShieldCheck,
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import AdminAnalytics from '../components/admin/AdminAnalytics';
+import AdminModeration from '../components/admin/AdminModeration';
 import {
   platformActivity,
   type AdminUserRole,
@@ -24,6 +26,7 @@ import { adminService } from '../services/adminService';
 type AdminTab =
   | 'overview'
   | 'analytics'
+  | 'moderation'
   | 'approvals'
   | 'users';
 
@@ -169,9 +172,9 @@ function AdminDashboard() {
 
           <p>
             Manage users, review course
-            submissions, monitor platform
-            analytics and moderate
-            administrative activity.
+            submissions, moderate forum
+            content and monitor platform
+            analytics.
           </p>
         </div>
 
@@ -295,6 +298,20 @@ function AdminDashboard() {
           }
         >
           Analytics
+        </button>
+
+        <button
+          type="button"
+          className={
+            activeTab === 'moderation'
+              ? 'active'
+              : ''
+          }
+          onClick={() =>
+            setActiveTab('moderation')
+          }
+        >
+          Moderation
         </button>
 
         <button
@@ -446,6 +463,36 @@ function AdminDashboard() {
 
                 <small>
                   View
+                </small>
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveTab(
+                    'moderation',
+                  )
+                }
+              >
+                <div className="governance-icon orange">
+                  <Flag
+                    size={19}
+                  />
+                </div>
+
+                <section>
+                  <strong>
+                    Content moderation
+                  </strong>
+
+                  <span>
+                    Review reported
+                    posts and comments
+                  </span>
+                </section>
+
+                <small>
+                  Review
                 </small>
               </button>
 
@@ -696,6 +743,10 @@ function AdminDashboard() {
 
       {activeTab === 'analytics' && (
         <AdminAnalytics />
+      )}
+
+      {activeTab === 'moderation' && (
+        <AdminModeration />
       )}
 
       {activeTab ===
